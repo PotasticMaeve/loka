@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
+import Button from 'openvue/button'
+import Card from 'openvue/card'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
+import Skeleton from 'openvue/skeleton'
 import { api, getApiErrorMessage } from '@/lib/api'
 import type { Settings } from '@/types/api'
 
@@ -14,8 +19,18 @@ const commonTimezones = [
   'UTC',
 ]
 
-const openHours = Array.from({ length: 24 }, (_, hour) => hour)
-const closeHours = Array.from({ length: 24 }, (_, hour) => hour + 1)
+function hourLabel(hour: number): string {
+  return `${String(hour).padStart(2, '0')}:00`
+}
+
+const openHours = Array.from({ length: 24 }, (_, hour) => ({
+  label: hourLabel(hour),
+  value: hour,
+}))
+const closeHours = Array.from({ length: 24 }, (_, hour) => ({
+  label: hourLabel(hour + 1),
+  value: hour + 1,
+}))
 
 const loading = ref(true)
 const saving = ref(false)
@@ -71,80 +86,83 @@ onMounted(loadSettings)
 
 <template>
   <div class="space-y-5">
-    <p v-if="error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>
-    <p v-if="success" class="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-      {{ success }}
-    </p>
+    <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
+    <Message v-if="success" severity="success" :closable="false">{{ success }}</Message>
 
-    <div v-if="loading" class="h-56 animate-pulse rounded-xl border border-slate-200 bg-white" />
+    <Card v-if="loading">
+      <template #content>
+        <Skeleton height="1.5rem" width="40%" />
+        <Skeleton height="3rem" class="mt-5" />
+        <Skeleton height="2.5rem" width="30%" class="mt-5" />
+      </template>
+    </Card>
 
-    <form
-      v-else
-      class="space-y-5 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-      @submit.prevent="save"
-    >
-      <div>
-        <h2 class="text-lg font-semibold">Operating hours</h2>
-        <p class="mt-1 text-sm text-slate-600">
-          Booking slots are generated between these hours, using the timezone below.
-        </p>
-      </div>
+    <Card v-else class="max-w-2xl">
+      <template #content>
+        <form class="space-y-5" @submit.prevent="save">
+          <div>
+            <h2 class="text-lg font-semibold tracking-tight text-ink">Operating hours</h2>
+            <p class="mt-1 text-sm leading-relaxed text-muted">
+              Booking slots are generated between these hours, using the timezone below.
+            </p>
+          </div>
 
-      <div class="grid gap-4 sm:grid-cols-3">
-        <div>
-          <label for="open-hour" class="block text-sm font-medium text-slate-700">Opens at</label>
-          <select
-            id="open-hour"
-            v-model.number="form.openHour"
-            class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-          >
-            <option v-for="hour in openHours" :key="hour" :value="hour">
-              {{ String(hour).padStart(2, '0') }}:00
-            </option>
-          </select>
-        </div>
+          <div class="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label for="open-hour" class="mb-1.5 block text-sm font-medium text-ink/80">
+                Opens at
+              </label>
+              <Select
+                v-model="form.openHour"
+                input-id="open-hour"
+                :options="openHours"
+                option-label="label"
+                option-value="value"
+                class="w-full"
+              />
+            </div>
 
-        <div>
-          <label for="close-hour" class="block text-sm font-medium text-slate-700">Closes at</label>
-          <select
-            id="close-hour"
-            v-model.number="form.closeHour"
-            class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-          >
-            <option v-for="hour in closeHours" :key="hour" :value="hour">
-              {{ String(hour).padStart(2, '0') }}:00
-            </option>
-          </select>
-        </div>
+            <div>
+              <label for="close-hour" class="mb-1.5 block text-sm font-medium text-ink/80">
+                Closes at
+              </label>
+              <Select
+                v-model="form.closeHour"
+                input-id="close-hour"
+                :options="closeHours"
+                option-label="label"
+                option-value="value"
+                class="w-full"
+              />
+            </div>
 
-        <div>
-          <label for="timezone" class="block text-sm font-medium text-slate-700">Timezone</label>
-          <input
-            id="timezone"
-            v-model="form.timezone"
-            type="text"
-            required
-            list="timezone-options"
-            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            <div>
+              <label for="timezone" class="mb-1.5 block text-sm font-medium text-ink/80">
+                Timezone
+              </label>
+              <Select
+                v-model="form.timezone"
+                input-id="timezone"
+                :options="commonTimezones"
+                editable
+                placeholder="Asia/Jakarta"
+                class="w-full"
+              />
+            </div>
+          </div>
+
+          <p class="rounded-xl border border-line bg-blue-50 px-4 py-3 text-xs leading-relaxed text-blue-900">
+            Closing time must be later than opening time. Use an IANA timezone name such as
+            <code class="font-mono">Asia/Jakarta</code>.
+          </p>
+
+          <Button
+            type="submit"
+            :label="saving ? 'Saving…' : 'Save settings'"
+            :loading="saving"
           />
-          <datalist id="timezone-options">
-            <option v-for="zone in commonTimezones" :key="zone" :value="zone" />
-          </datalist>
-        </div>
-      </div>
-
-      <p class="rounded-lg bg-amber-50 px-4 py-3 text-xs text-amber-800">
-        Closing time must be later than opening time. Use an IANA timezone name such as
-        <code class="font-mono">Asia/Jakarta</code>.
-      </p>
-
-      <button
-        type="submit"
-        :disabled="saving"
-        class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {{ saving ? 'Saving...' : 'Save settings' }}
-      </button>
-    </form>
+        </form>
+      </template>
+    </Card>
   </div>
 </template>

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import Button from 'openvue/button'
+import Message from 'openvue/message'
+import Skeleton from 'openvue/skeleton'
 import { api, getApiErrorMessage } from '@/lib/api'
 import { formatCurrency } from '@/lib/format'
 import type { Room } from '@/types/api'
@@ -7,6 +10,14 @@ import type { Room } from '@/types/api'
 const rooms = ref<Room[]>([])
 const loading = ref(true)
 const error = ref('')
+
+// Facilities cycle through the palette so a wall of chips stays scannable.
+const chipTones = [
+  'bg-blue-50 text-blue-900',
+  'bg-blue-100 text-blue-900',
+  'bg-blue-50 text-blue-800',
+  'bg-blue-100 text-blue-800',
+]
 
 async function loadRooms() {
   loading.value = true
@@ -26,74 +37,83 @@ onMounted(loadRooms)
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header class="flex flex-wrap items-end justify-between gap-3">
+  <div class="space-y-8">
+    <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold">Rooms</h1>
-        <p class="mt-1 text-sm text-slate-600">
-          Pick a room, choose a date, and reserve the hours you need.
+        <p class="eyebrow">Available now</p>
+        <h1 class="page-title mt-3">Rooms</h1>
+        <p class="page-subtitle max-w-xl">
+          Pick a room, choose a date, and reserve the exact hours you need.
         </p>
       </div>
-      <button
-        type="button"
-        class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-        :disabled="loading"
+      <Button
+        label="Refresh"
+        severity="secondary"
+        outlined
+        :loading="loading"
         @click="loadRooms"
-      >
-        Refresh
-      </button>
+      />
     </header>
 
-    <p v-if="error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-      {{ error }}
-    </p>
+    <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
 
-    <div v-if="loading" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div
-        v-for="n in 3"
-        :key="n"
-        class="h-40 animate-pulse rounded-xl border border-slate-200 bg-white"
-      />
+    <div v-if="loading" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div v-for="n in 3" :key="n" class="surface p-6">
+        <Skeleton height="1.6rem" width="60%" />
+        <Skeleton height="1rem" width="40%" class="mt-4" />
+        <Skeleton height="1rem" width="80%" class="mt-2" />
+        <Skeleton height="2.6rem" class="mt-6" />
+      </div>
     </div>
 
-    <p
+    <div
       v-else-if="rooms.length === 0"
-      class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-600"
+      class="surface flex flex-col items-center gap-3 border-dashed px-6 py-16 text-center"
     >
-      No rooms are available yet. Check back later.
-    </p>
+      <span class="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600 text-white">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6">
+          <rect x="3" y="4" width="18" height="16" rx="4" />
+          <path d="M3 10h18" />
+        </svg>
+      </span>
+      <p class="text-sm font-semibold text-ink">No rooms are listed yet</p>
+      <p class="max-w-sm text-sm text-muted">
+        An administrator needs to publish a room before bookings can start.
+      </p>
+    </div>
 
-    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div v-else class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       <article
         v-for="room in rooms"
         :key="room.id"
-        class="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-indigo-300 hover:shadow"
+        class="surface group flex flex-col p-6 transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_2px_0_#e0dacb,0_28px_52px_-30px_rgba(43,31,224,0.35)]"
       >
         <div class="flex items-start justify-between gap-3">
-          <h2 class="text-lg font-semibold text-slate-900">{{ room.name }}</h2>
-          <span class="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
-            {{ formatCurrency(room.pricePerHour) }} / hour
+          <div>
+            <h2 class="text-xl font-bold tracking-tight text-ink">{{ room.name }}</h2>
+            <p class="mt-1 text-sm text-muted">Fits up to {{ room.capacity }} people</p>
+          </div>
+          <span
+            class="shrink-0 rounded-full bg-gradient-to-r from-blue-950 to-blue-600 px-3 py-1 font-mono text-xs font-semibold text-white"
+          >
+            {{ formatCurrency(room.pricePerHour) }}/h
           </span>
         </div>
 
-        <p class="mt-1 text-sm text-slate-600">Fits up to {{ room.capacity }} people</p>
-
-        <ul v-if="room.facilities.length" class="mt-3 flex flex-wrap gap-1.5">
+        <ul v-if="room.facilities.length" class="mt-5 flex flex-wrap gap-1.5">
           <li
-            v-for="facility in room.facilities"
+            v-for="(facility, index) in room.facilities"
             :key="facility"
-            class="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-700"
+            class="rounded-full px-2.5 py-1 text-xs font-medium"
+            :class="chipTones[index % chipTones.length]"
           >
             {{ facility }}
           </li>
         </ul>
-        <p v-else class="mt-3 text-xs text-slate-400">No facilities listed</p>
+        <p v-else class="mt-5 text-xs text-muted">No facilities listed</p>
 
-        <RouterLink
-          :to="{ name: 'room-detail', params: { id: room.id } }"
-          class="mt-5 inline-block rounded-lg bg-indigo-600 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-indigo-700"
-        >
-          View availability
+        <RouterLink :to="{ name: 'room-detail', params: { id: room.id } }" class="mt-6 block">
+          <Button label="View availability" class="w-full" severity="secondary" outlined />
         </RouterLink>
       </article>
     </div>

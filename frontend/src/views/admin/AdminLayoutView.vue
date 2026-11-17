@@ -7,19 +7,20 @@ const tabs = [
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-8">
     <header>
-      <h1 class="text-2xl font-bold">Admin dashboard</h1>
-      <p class="mt-1 text-sm text-slate-600">Manage rooms, reservations, and operating hours.</p>
+      <p class="eyebrow">Administration</p>
+      <h1 class="page-title mt-3">Admin dashboard</h1>
+      <p class="page-subtitle">Manage rooms, reservations, and operating hours.</p>
     </header>
 
-    <nav class="flex flex-wrap gap-2 border-b border-slate-200 pb-3">
+    <nav class="inline-flex flex-wrap gap-1 rounded-full border border-line bg-white p-1">
       <RouterLink
         v-for="tab in tabs"
         :key="tab.name"
         :to="{ name: tab.name }"
-        class="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 transition"
-        active-class="bg-indigo-600 text-white"
+        class="rounded-full px-4 py-1.5 text-sm font-semibold text-muted transition hover:text-ink"
+        active-class="bg-ink text-white hover:text-white"
       >
         {{ tab.label }}
       </RouterLink>

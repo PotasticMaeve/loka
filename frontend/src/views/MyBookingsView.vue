@@ -1,18 +1,28 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import Button from 'openvue/button'
+import Card from 'openvue/card'
+import Message from 'openvue/message'
+import SelectButton from 'openvue/selectbutton'
+import Skeleton from 'openvue/skeleton'
+import { useConfirm } from 'openvue/useconfirm'
+import { useToast } from 'openvue/usetoast'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { api, getApiErrorMessage } from '@/lib/api'
-import { formatCurrency, formatInZone } from '@/lib/format'
+import { formatCurrency, formatDayInZone, formatTimeInZone } from '@/lib/format'
 import type { Booking, BookingStatus, Settings } from '@/types/api'
 
 type Filter = BookingStatus | 'ALL'
 
-const filters: Array<{ value: Filter; label: string }> = [
-  { value: 'ALL', label: 'All' },
-  { value: 'CONFIRMED', label: 'Confirmed' },
-  { value: 'COMPLETED', label: 'Completed' },
-  { value: 'CANCELLED', label: 'Cancelled' },
+const filters: Array<{ label: string; value: Filter }> = [
+  { label: 'All', value: 'ALL' },
+  { label: 'Confirmed', value: 'CONFIRMED' },
+  { label: 'Completed', value: 'COMPLETED' },
+  { label: 'Cancelled', value: 'CANCELLED' },
 ]
+
+const confirm = useConfirm()
+const toast = useToast()
 
 const bookings = ref<Booking[]>([])
 const filter = ref<Filter>('ALL')
@@ -23,6 +33,10 @@ const error = ref('')
 const cancellingId = ref<string | null>(null)
 
 const CANCEL_CUTOFF_MS = 2 * 60 * 60 * 1000
+
+const upcomingCount = computed(
+  () => bookings.value.filter((booking) => booking.status === 'CONFIRMED').length,
+)
 
 function canCancel(booking: Booking): boolean {
   return (
@@ -61,6 +75,17 @@ async function changeFilter(value: Filter) {
   await loadBookings()
 }
 
+function askCancel(booking: Booking) {
+  confirm.require({
+    header: 'Cancel this booking?',
+    message: `${booking.room.name} · ${formatDayInZone(booking.startTime, timezone.value)}. This cannot be undone.`,
+    acceptLabel: 'Cancel booking',
+    rejectLabel: 'Keep it',
+    acceptClass: 'p-button-danger',
+    accept: () => void cancelBooking(booking),
+  })
+}
+
 async function cancelBooking(booking: Booking) {
   cancellingId.value = booking.id
   error.value = ''
@@ -68,6 +93,12 @@ async function cancelBooking(booking: Booking) {
   try {
     await api.patch(`/bookings/${booking.id}/cancel`)
     await loadBookings()
+    toast.add({
+      severity: 'info',
+      summary: 'Booking cancelled',
+      detail: booking.room.name,
+      life: 3500,
+    })
   } catch (err) {
     error.value = getApiErrorMessage(err)
   } finally {
@@ -81,110 +112,108 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="space-y-6">
-    <header class="flex flex-wrap items-end justify-between gap-3">
+  <div class="space-y-8">
+    <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold">My bookings</h1>
-        <p class="mt-1 text-sm text-slate-600">
-          Cancel a reservation up to 2 hours before it starts.
+        <p class="eyebrow">Your reservations</p>
+        <h1 class="page-title mt-3">My bookings</h1>
+        <p class="page-subtitle">
+          {{ upcomingCount }} confirmed · cancel up to 2 hours before the start time.
         </p>
       </div>
-      <RouterLink
-        to="/rooms"
-        class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
-      >
-        Book another room
+      <RouterLink to="/rooms">
+        <Button label="Book another room" />
       </RouterLink>
     </header>
 
-    <div class="flex flex-wrap gap-2">
-      <button
-        v-for="option in filters"
-        :key="option.value"
-        type="button"
-        class="rounded-full border px-3 py-1.5 text-sm font-medium transition"
-        :class="
-          filter === option.value
-            ? 'border-indigo-600 bg-indigo-600 text-white'
-            : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
-        "
-        @click="changeFilter(option.value)"
-      >
-        {{ option.label }}
-      </button>
+    <SelectButton
+      v-model="filter"
+      :options="filters"
+      option-label="label"
+      option-value="value"
+      :allow-empty="false"
+      @change="changeFilter(filter)"
+    />
+
+    <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
+
+    <div v-if="loading" class="space-y-4">
+      <Card v-for="n in 3" :key="n">
+        <template #content>
+          <Skeleton height="1.5rem" width="35%" />
+          <Skeleton height="1rem" width="55%" class="mt-3" />
+          <Skeleton height="2.5rem" class="mt-5" />
+        </template>
+      </Card>
     </div>
 
-    <p v-if="error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>
-
-    <div v-if="loading" class="space-y-3">
-      <div v-for="n in 3" :key="n" class="h-24 animate-pulse rounded-xl border border-slate-200 bg-white" />
-    </div>
-
-    <p
+    <div
       v-else-if="bookings.length === 0"
-      class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-600"
+      class="surface flex flex-col items-center gap-3 border-dashed px-6 py-16 text-center"
     >
-      No bookings yet.
-      <RouterLink to="/rooms" class="font-semibold text-indigo-600 hover:text-indigo-700">
-        Browse rooms
+      <span class="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600 text-white">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6">
+          <path d="M8 2v4M16 2v4M3 10h18" stroke-linecap="round" />
+          <rect x="3" y="4" width="18" height="18" rx="4" />
+        </svg>
+      </span>
+      <p class="text-sm font-semibold text-ink">No bookings in this view</p>
+      <p class="max-w-sm text-sm text-muted">
+        Browse the rooms and pick a free hour — it takes about twenty seconds.
+      </p>
+      <RouterLink to="/rooms" class="mt-2">
+        <Button label="Browse rooms" severity="secondary" outlined />
       </RouterLink>
-      to make your first reservation.
-    </p>
+    </div>
 
-    <ul v-else class="space-y-3">
-      <li
-        v-for="booking in bookings"
-        :key="booking.id"
-        class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-      >
-        <div class="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 class="text-lg font-semibold text-slate-900">{{ booking.room.name }}</h2>
-            <p class="mt-1 text-sm text-slate-600">
-              {{ formatInZone(booking.startTime, timezone) }} –
-              {{ formatInZone(booking.endTime, timezone) }}
+    <div v-else class="space-y-4">
+      <Card v-for="booking in bookings" :key="booking.id">
+        <template #content>
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 class="text-xl font-bold tracking-tight text-ink">{{ booking.room.name }}</h2>
+              <p class="mt-1 font-mono text-sm text-muted">
+                {{ formatDayInZone(booking.startTime, timezone) }} ·
+                {{ formatTimeInZone(booking.startTime, timezone) }} –
+                {{ formatTimeInZone(booking.endTime, timezone) }}
+              </p>
+            </div>
+            <StatusBadge :status="booking.status" />
+          </div>
+
+          <dl class="mt-5 grid gap-4 border-t border-line pt-4 sm:grid-cols-3">
+            <div>
+              <dt class="meta-label">Total</dt>
+              <dd class="mt-1 font-display text-lg font-extrabold text-ink">
+                {{ formatCurrency(booking.totalPrice) }}
+              </dd>
+            </div>
+            <div>
+              <dt class="meta-label">Booked on</dt>
+              <dd class="meta-value">{{ formatDayInZone(booking.createdAt, timezone) }}</dd>
+            </div>
+            <div>
+              <dt class="meta-label">Booking ID</dt>
+              <dd class="mt-1 truncate font-mono text-xs text-muted">{{ booking.id }}</dd>
+            </div>
+          </dl>
+
+          <div v-if="booking.status === 'CONFIRMED'" class="mt-5 flex flex-wrap items-center gap-3">
+            <Button
+              v-if="canCancel(booking)"
+              label="Cancel booking"
+              severity="danger"
+              outlined
+              size="small"
+              :loading="cancellingId === booking.id"
+              @click="askCancel(booking)"
+            />
+            <p v-else class="text-xs text-muted">
+              Cancellation closes 2 hours before the start time.
             </p>
           </div>
-          <StatusBadge :status="booking.status" />
-        </div>
-
-        <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-          <div>
-            <dt class="font-medium text-slate-500">Total</dt>
-            <dd class="mt-0.5 font-semibold text-slate-900">
-              {{ formatCurrency(booking.totalPrice) }}
-            </dd>
-          </div>
-          <div>
-            <dt class="font-medium text-slate-500">Booked on</dt>
-            <dd class="mt-0.5 text-slate-900">
-              {{ formatInZone(booking.createdAt, timezone) }}
-            </dd>
-          </div>
-          <div>
-            <dt class="font-medium text-slate-500">Booking ID</dt>
-            <dd class="mt-0.5 font-mono text-xs text-slate-500">{{ booking.id }}</dd>
-          </div>
-        </dl>
-
-        <div
-          v-if="booking.status === 'CONFIRMED'"
-          class="mt-4 flex flex-wrap items-center gap-3"
-        >
-          <button
-            v-if="canCancel(booking)"
-            type="button"
-            :disabled="cancellingId === booking.id"
-            class="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-            @click="cancelBooking(booking)"
-          >
-            {{ cancellingId === booking.id ? 'Cancelling...' : 'Cancel booking' }}
-          </button>
-          <p v-else class="text-xs text-slate-500">
-            Cancellation closes 2 hours before the start time.
-          </p>
-        </div>
-      </li>
-    </ul>
+        </template>
+      </Card>
+    </div>
   </div>
 </template>
