@@ -4,7 +4,9 @@ import type { ApiErrorBody } from '@/types/api'
 export const TOKEN_KEY = 'loka_token'
 export const USER_KEY = 'loka_user'
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'
+// Relative by default so dev goes through the Vite proxy (same origin, no CORS)
+// and production can point at a real host with VITE_API_URL.
+const baseURL = import.meta.env.VITE_API_URL ?? '/api'
 
 export const api = axios.create({ baseURL })
 

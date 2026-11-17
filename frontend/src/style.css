@@ -1,9 +1,233 @@
+/**
+ * Layer order matters: OpenVue (styled mode) emits `@layer theme, base, primevue`
+ * itself at boot, before any bundled CSS is parsed. Declaring the same order
+ * here keeps Tailwind utilities winning over library defaults without a single
+ * `!important`.
+ */
+@layer theme, base, primevue, components, utilities;
+
 @import 'tailwindcss';
 
-html {
-  color-scheme: light;
+@theme {
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Loka palette — one violet family, no second accent, no gradients.
+     Depth comes from tint (light) and shade (dark) of the same hue. */
+  --color-ink: #1b1035;
+  --color-paper: #f7f5fd;
+  --color-line: #e4def6;
+  --color-muted: #5f5580;
+
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-violet-800: #5b21b6;
+  --color-violet-900: #4c1d95;
+  --color-violet-950: #2e1065;
+
+  --radius-card: 26px;
+  --shadow-card: 0 1px 0 #e4def6, 0 24px 48px -34px rgba(27, 16, 53, 0.45);
+  --shadow-lift: 0 2px 0 #e4def6, 0 30px 56px -30px rgba(124, 58, 237, 0.35);
 }
 
-body {
-  margin: 0;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    color-scheme: light;
+    @apply bg-paper font-sans text-base text-ink;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-extrabold tracking-[-0.02em];
+  }
+
+  ::selection {
+    @apply bg-violet-200 text-violet-950;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1
+      font-mono text-[11px] font-medium tracking-[0.08em] text-muted uppercase;
+  }
+
+  .page-title {
+    @apply font-display text-3xl font-extrabold tracking-[-0.03em] text-ink sm:text-4xl;
+  }
+
+  .page-subtitle {
+    @apply mt-2 text-sm leading-relaxed text-muted sm:text-base;
+  }
+
+  .surface {
+    @apply rounded-[26px] border border-line bg-white;
+  }
+
+  /* Solid deep violet — replaces the old gradient panel. */
+  .surface-dark {
+    @apply rounded-[26px] bg-violet-950 text-white;
+  }
+
+  .meta-label {
+    @apply font-mono text-[11px] font-medium tracking-[0.06em] text-muted uppercase;
+  }
+
+  .meta-value {
+    @apply mt-1 text-sm font-semibold text-ink;
+  }
+
+  .chip {
+    @apply inline-flex items-center rounded-full border border-line bg-violet-50 px-2.5 py-1
+      text-xs font-medium text-violet-900;
+  }
+
+  .link-underline {
+    @apply underline decoration-violet-300 decoration-2 underline-offset-4;
+  }
+}
+
+/* Motion: one entrance and one nudge. Both are decorative only. */
+@keyframes loka-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loka-nudge {
+  from {
+    transform: translate(-2px, -50%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translate(3px, -50%);
+    opacity: 1;
+  }
+}
+
+.reveal {
+  animation: loka-fade-up 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.arrow-nudge {
+  animation: loka-nudge 1.5s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .arrow-nudge {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Self-hosted fonts: Bricolage Grotesque (display), DM Sans (text),
+   JetBrains Mono (numbers and labels). Served from /fonts so the app
+   never depends on a third-party font CDN at runtime.
+   ------------------------------------------------------------------ */
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-400_800-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-400_800-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans-400_700-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans-400_700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-500-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Confirmation modal: a touch wider than the library default (24rem). */
+.p-confirmdialog {
+  width: 30rem;
+  max-width: calc(100vw - 2rem);
+}
+
+.p-confirmdialog .p-confirmdialog-message {
+  line-height: 1.6;
 }

@@ -9,7 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@openvue/themes": "1.1.1",
     "axios": "^1.21.1",
+    "openvue": "1.1.1",
     "pinia": "^4.1.0",
     "vue": "^3.5.44",
     "vue-router": "^5.5.1"
