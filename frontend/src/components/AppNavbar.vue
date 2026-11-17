@@ -27,6 +27,19 @@ function logout() {
         </RouterLink>
 
         <template v-if="auth.isAuthenticated">
+          <RouterLink
+            to="/bookings"
+            class="font-medium text-slate-600 transition hover:text-slate-900"
+          >
+            My bookings
+          </RouterLink>
+          <RouterLink
+            v-if="auth.isAdmin"
+            to="/admin"
+            class="font-medium text-slate-600 transition hover:text-slate-900"
+          >
+            Admin
+          </RouterLink>
           <span class="hidden text-slate-600 sm:inline">
             {{ auth.user?.name ?? 'Account' }}
             <span

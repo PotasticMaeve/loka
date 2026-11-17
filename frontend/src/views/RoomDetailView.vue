@@ -320,6 +320,11 @@ onMounted(async () => {
           }}
         </p>
         <p class="mt-1 font-semibold">Total: {{ formatCurrency(booked.totalPrice) }}</p>
+        <p class="mt-3">
+          <RouterLink to="/bookings" class="font-semibold underline">
+            View my bookings
+          </RouterLink>
+        </p>
       </section>
     </template>
   </div>

@@ -5,6 +5,7 @@ import HomeView from '@/views/HomeView.vue'
 declare module 'vue-router' {
   interface RouteMeta {
     requiresAuth?: boolean
+    requiresAdmin?: boolean
     guestOnly?: boolean
   }
 }
@@ -26,6 +27,35 @@ const router = createRouter({
       path: '/rooms/:id',
       name: 'room-detail',
       component: () => import('@/views/RoomDetailView.vue'),
+    },
+    {
+      path: '/bookings',
+      name: 'my-bookings',
+      component: () => import('@/views/MyBookingsView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/admin',
+      component: () => import('@/views/admin/AdminLayoutView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+      children: [
+        { path: '', redirect: { name: 'admin-rooms' } },
+        {
+          path: 'rooms',
+          name: 'admin-rooms',
+          component: () => import('@/views/admin/AdminRoomsView.vue'),
+        },
+        {
+          path: 'bookings',
+          name: 'admin-bookings',
+          component: () => import('@/views/admin/AdminBookingsView.vue'),
+        },
+        {
+          path: 'settings',
+          name: 'admin-settings',
+          component: () => import('@/views/admin/AdminSettingsView.vue'),
+        },
+      ],
     },
     {
       path: '/login',
@@ -51,6 +81,10 @@ router.beforeEach((to) => {
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: 'login', query: { redirect: to.fullPath } }
+  }
+
+  if (to.meta.requiresAdmin && !auth.isAdmin) {
+    return { name: 'home' }
   }
 
   if (to.meta.guestOnly && auth.isAuthenticated) {
