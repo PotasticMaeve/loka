@@ -89,7 +89,7 @@ function logout() {
         <template v-if="auth.isAuthenticated">
           <button
             type="button"
-            class="flex items-center gap-2.5 rounded-full border border-line bg-white py-1 pr-3.5 pl-1 transition-colors hover:border-violet-400"
+            class="flex items-center gap-2.5 rounded-full py-1 pr-2 pl-1 transition hover:bg-transparent hover:opacity-80"
             aria-haspopup="true"
             @click="toggleAccount"
           >

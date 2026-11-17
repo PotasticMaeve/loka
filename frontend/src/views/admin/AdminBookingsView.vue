@@ -4,6 +4,7 @@ import Button from 'openvue/button'
 import Column from 'openvue/column'
 import DataTable from 'openvue/datatable'
 import Message from 'openvue/message'
+import Select from 'openvue/select'
 import SelectButton from 'openvue/selectbutton'
 import { useToast } from 'openvue/usetoast'
 import StatusBadge from '@/components/StatusBadge.vue'
@@ -87,14 +88,26 @@ onMounted(async () => {
 <template>
   <div class="space-y-5">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <SelectButton
-        v-model="filter"
-        :options="filters"
-        option-label="label"
-        option-value="value"
-        :allow-empty="false"
-        @change="changeFilter(filter)"
-      />
+      <div class="w-full sm:w-auto">
+        <Select
+          v-model="filter"
+          :options="filters"
+          option-label="label"
+          option-value="value"
+          class="w-full sm:hidden"
+          @change="changeFilter(filter)"
+        />
+        <div class="hidden sm:block">
+          <SelectButton
+            v-model="filter"
+            :options="filters"
+            option-label="label"
+            option-value="value"
+            :allow-empty="false"
+            @change="changeFilter(filter)"
+          />
+        </div>
+      </div>
 
       <Button
         label="Refresh"

@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import Button from 'openvue/button'
 import Card from 'openvue/card'
 import Message from 'openvue/message'
+import Select from 'openvue/select'
 import SelectButton from 'openvue/selectbutton'
 import Skeleton from 'openvue/skeleton'
 import { useConfirm } from 'openvue/useconfirm'
@@ -126,25 +127,47 @@ onMounted(async () => {
       </RouterLink>
     </header>
 
-    <SelectButton
-      v-model="filter"
-      :options="filters"
-      option-label="label"
-      option-value="value"
-      :allow-empty="false"
-      @change="changeFilter(filter)"
-    />
+    <!-- Mobile: a dropdown never clips. Desktop: segmented control. -->
+    <div class="sm:hidden">
+      <Select
+        v-model="filter"
+        :options="filters"
+        option-label="label"
+        option-value="value"
+        class="w-full"
+        @change="changeFilter(filter)"
+      />
+    </div>
+    <div class="hidden overflow-x-auto sm:block">
+      <SelectButton
+        v-model="filter"
+        :options="filters"
+        option-label="label"
+        option-value="value"
+        :allow-empty="false"
+        @change="changeFilter(filter)"
+      />
+    </div>
 
     <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
 
-    <div v-if="loading" class="space-y-4">
-      <Card v-for="n in 3" :key="n">
-        <template #content>
-          <Skeleton height="1.5rem" width="35%" />
-          <Skeleton height="1rem" width="55%" class="mt-3" />
-          <Skeleton height="2.5rem" class="mt-5" />
-        </template>
-      </Card>
+    <div v-if="loading" class="space-y-4" aria-hidden="true">
+      <div v-for="n in 3" :key="n" class="surface p-6">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            <Skeleton height="1.5rem" width="45%" />
+            <Skeleton height="0.9rem" width="65%" class="mt-3" />
+          </div>
+          <Skeleton height="1.6rem" width="6rem" border-radius="999px" />
+        </div>
+
+        <div class="mt-5 grid gap-4 border-t border-line pt-4 sm:grid-cols-3">
+          <div v-for="meta in 3" :key="meta">
+            <Skeleton height="0.7rem" width="45%" />
+            <Skeleton height="1rem" width="70%" class="mt-2" />
+          </div>
+        </div>
+      </div>
     </div>
 
     <div
@@ -205,6 +228,7 @@ onMounted(async () => {
               severity="danger"
               outlined
               size="small"
+              class="!border-red-400 !text-red-600 hover:!border-red-500 hover:!bg-red-50 hover:!text-red-700"
               :loading="cancellingId === booking.id"
               @click="askCancel(booking)"
             />
