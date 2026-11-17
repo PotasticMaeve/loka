@@ -123,14 +123,11 @@ const facts = [
     </section>
 
     <section>
-      <div class="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p class="eyebrow">How booking works</p>
-          <h2 class="mt-3 font-display text-2xl font-extrabold tracking-tight text-ink">
-            Three steps, about a minute.
-          </h2>
-        </div>
-        <p class="font-mono text-[11px] tracking-wide text-muted uppercase">No email · No approval</p>
+      <div>
+        <p class="eyebrow">How booking works</p>
+        <h2 class="mt-3 font-display text-2xl font-extrabold tracking-tight text-ink">
+          Three steps, about a minute.
+        </h2>
       </div>
 
       <ol class="mt-6 grid gap-4 sm:grid-cols-3 sm:gap-6">

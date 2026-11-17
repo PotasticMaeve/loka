@@ -78,8 +78,8 @@ function logout() {
           v-for="link in navLinks"
           :key="link.to"
           :to="link.to"
-          class="rounded-full px-3.5 py-1.5 text-sm font-semibold text-muted transition-colors hover:bg-violet-100 hover:text-violet-900"
-          active-class="bg-ink text-white hover:bg-ink hover:text-white"
+          class="relative rounded-full px-3 py-1.5 text-sm font-semibold text-muted transition-colors hover:text-ink"
+          active-class="text-ink after:absolute after:inset-x-3 after:-bottom-1 after:h-[2px] after:rounded-full after:bg-violet-500"
         >
           {{ link.label }}
         </RouterLink>
@@ -89,7 +89,7 @@ function logout() {
         <template v-if="auth.isAuthenticated">
           <button
             type="button"
-            class="flex items-center gap-2.5 rounded-full border border-line bg-white py-1 pr-3.5 pl-1 transition hover:border-ink/30"
+            class="flex items-center gap-2.5 rounded-full border border-line bg-white py-1 pr-3.5 pl-1 transition-colors hover:border-violet-400"
             aria-haspopup="true"
             @click="toggleAccount"
           >
@@ -112,8 +112,11 @@ function logout() {
         </template>
 
         <template v-else>
-          <RouterLink to="/login">
-            <Button label="Log in" severity="secondary" text />
+          <RouterLink
+            to="/login"
+            class="relative rounded-full px-3 py-1.5 text-sm font-semibold text-muted transition-colors hover:text-ink"
+          >
+            Log in
           </RouterLink>
           <RouterLink to="/register">
             <Button label="Get started" />
