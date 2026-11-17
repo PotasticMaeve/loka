@@ -32,6 +32,12 @@ const features = [
       </p>
 
       <div class="mt-6 flex flex-wrap items-center gap-3">
+        <RouterLink
+          to="/rooms"
+          class="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50"
+        >
+          Browse rooms
+        </RouterLink>
         <template v-if="auth.isAuthenticated">
           <span class="rounded-lg bg-white/10 px-4 py-2 text-sm">
             Signed in as <strong>{{ auth.user?.name }}</strong>
@@ -40,7 +46,7 @@ const features = [
         <template v-else>
           <RouterLink
             to="/register"
-            class="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50"
+            class="rounded-lg border border-white/40 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
           >
             Create an account
           </RouterLink>
@@ -73,8 +79,12 @@ const features = [
           <dd class="mt-1 text-slate-900">{{ auth.user?.role }}</dd>
         </div>
       </dl>
-      <p class="mt-5 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        Room browsing and booking arrive in the next step.
+      <p class="mt-5 rounded-lg bg-indigo-50 px-4 py-3 text-sm text-indigo-800">
+        Ready to book?
+        <RouterLink to="/rooms" class="font-semibold underline">
+          Browse the rooms
+        </RouterLink>
+        and pick your hours.
       </p>
     </section>
 

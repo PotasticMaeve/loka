@@ -19,6 +19,13 @@ function logout() {
       </RouterLink>
 
       <nav class="flex items-center gap-4 text-sm">
+        <RouterLink
+          to="/rooms"
+          class="font-medium text-slate-600 transition hover:text-slate-900"
+        >
+          Rooms
+        </RouterLink>
+
         <template v-if="auth.isAuthenticated">
           <span class="hidden text-slate-600 sm:inline">
             {{ auth.user?.name ?? 'Account' }}

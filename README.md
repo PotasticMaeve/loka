@@ -2,7 +2,7 @@
 
 A room booking API for studios, meeting rooms, and shared spaces. Users can browse rooms, check hourly availability, and reserve time slots. Admins manage rooms, opening hours, and every reservation.
 
-> **Status:** the backend API is implemented and tested. The Vue frontend foundation (auth UI) is in place. The booking calendar, admin dashboard, full Docker setup, and database seed are still in progress (see [Roadmap](#roadmap)).
+> **Status:** the backend API is implemented and tested. The Vue frontend covers authentication, room browsing, and hourly booking. The admin dashboard, Docker setup, and database seed are still in progress (see [Roadmap](#roadmap)).
 
 ## Tech stack
 
@@ -35,11 +35,14 @@ A room booking API for studios, meeting rooms, and shared spaces. Users can brow
 - [x] Vue 3 + Vite + TypeScript frontend with Tailwind CSS
 - [x] Pinia auth store with a persisted JWT session
 - [x] Login and registration pages
+- [x] Room list with capacity, hourly price, and facilities
+- [x] Room detail with date picker and hourly slot grid
+- [x] Multi-slot selection with live total price
+- [x] Booking creation from the UI, with conflict feedback
 
 ### Planned
 
-- [ ] Room browsing and hourly slot calendar
-- [ ] Booking flow, reservation history, and cancellation UI
+- [ ] Reservation history and cancellation UI
 - [ ] Admin dashboard (rooms, bookings, operating hours)
 - [ ] Dockerfiles for backend and frontend, single root `docker-compose.yml`
 - [ ] `prisma/seed.ts` with demo admin/user accounts and sample rooms
@@ -74,7 +77,7 @@ loka/
 │   │   ├── router/
 │   │   ├── stores/auth.ts         # Pinia session store
 │   │   ├── types/
-│   │   ├── views/                 # home, login, register
+│   │   ├── views/                 # home, login, register, rooms, room detail
 │   │   ├── App.vue
 │   │   ├── main.ts
 │   │   └── style.css
@@ -446,6 +449,5 @@ Run from `frontend/`:
 
 ## Roadmap
 
-1. **Booking UI** — room list, room detail, date picker, hourly slot grid, multi-slot selection.
-2. **User & admin pages** — reservation history, admin room CRUD, all-bookings table, operating hours form.
-3. **Production setup** — Dockerfile for backend and frontend, Nginx, root `docker-compose.yml`, seed script, polished README.
+1. **User & admin pages** — reservation history, cancellation UI, admin room CRUD, all-bookings table, operating hours form.
+2. **Production setup** — Dockerfile for backend and frontend, Nginx, root `docker-compose.yml`, seed script, polished README.
