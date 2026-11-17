@@ -2,7 +2,7 @@
 
 A room booking API for studios, meeting rooms, and shared spaces. Users can browse rooms, check hourly availability, and reserve time slots. Admins manage rooms, opening hours, and every reservation.
 
-> **Status:** backend is implemented and tested. The Vue frontend, full Docker setup, and database seed are still in progress (see [Roadmap](#roadmap)).
+> **Status:** the backend API is implemented and tested. The Vue frontend foundation (auth UI) is in place. The booking calendar, admin dashboard, full Docker setup, and database seed are still in progress (see [Roadmap](#roadmap)).
 
 ## Tech stack
 
@@ -15,6 +15,7 @@ A room booking API for studios, meeting rooms, and shared spaces. Users can brow
 | Validation | Zod 4 |
 | Auth | JWT (`jsonwebtoken`) + bcrypt |
 | Date/time | `date-fns` + `date-fns-tz` |
+| Frontend | Vue 3, Vite, TypeScript, Pinia, Vue Router, Tailwind CSS |
 
 ## Features
 
@@ -31,11 +32,15 @@ A room booking API for studios, meeting rooms, and shared spaces. Users can brow
 - [x] Zod validation middleware for `body`, `query`, and `params`
 - [x] Consistent JSON error responses
 - [x] PostgreSQL 17 via Docker Compose
+- [x] Vue 3 + Vite + TypeScript frontend with Tailwind CSS
+- [x] Pinia auth store with a persisted JWT session
+- [x] Login and registration pages
 
 ### Planned
 
-- [ ] Vue 3 + Vite + TypeScript frontend
-- [ ] Pinia stores, booking calendar, admin dashboard
+- [ ] Room browsing and hourly slot calendar
+- [ ] Booking flow, reservation history, and cancellation UI
+- [ ] Admin dashboard (rooms, bookings, operating hours)
 - [ ] Dockerfiles for backend and frontend, single root `docker-compose.yml`
 - [ ] `prisma/seed.ts` with demo admin/user accounts and sample rooms
 
@@ -61,6 +66,19 @@ loka/
 │   │   ├── app.ts
 │   │   └── server.ts
 │   ├── prisma.config.ts
+│   └── .env.example
+├── frontend/
+│   ├── src/
+│   │   ├── components/            # navbar and shared UI
+│   │   ├── lib/api.ts             # axios client + interceptors
+│   │   ├── router/
+│   │   ├── stores/auth.ts         # Pinia session store
+│   │   ├── types/
+│   │   ├── views/                 # home, login, register
+│   │   ├── App.vue
+│   │   ├── main.ts
+│   │   └── style.css
+│   ├── vite.config.ts
 │   └── .env.example
 ├── postgresql_17/
 │   └── docker-compose.yml         # local PostgreSQL only
@@ -97,7 +115,7 @@ cd backend
 cp .env.example .env
 ```
 
-Edit `.env` if needed. `JWT_SECRET` must be at least 32 characters.
+The template ships with empty values on purpose. Fill in `DATABASE_URL` and `JWT_SECRET`; the secret must be at least 32 characters.
 
 ### 3. Install, migrate, and run
 
@@ -114,6 +132,19 @@ curl http://localhost:4000/api/health
 # {"status":"ok","db":"connected","timestamp":"..."}
 ```
 
+### 4. Run the frontend
+
+In a second terminal:
+
+```bash
+cd frontend
+cp .env.example .env
+pnpm install
+pnpm dev               # http://localhost:5173
+```
+
+Make sure `CORS_ORIGIN` in `backend/.env` matches the frontend URL (`http://localhost:5173` by default).
+
 ## Environment variables
 
 | Variable | Required | Default | Description |
@@ -123,6 +154,12 @@ curl http://localhost:4000/api/health
 | `PORT` | no | `4000` | HTTP port |
 | `NODE_ENV` | no | `development` | `development`, `test`, or `production` |
 | `CORS_ORIGIN` | no | `http://localhost:5173` | Allowed frontend origin |
+
+Frontend variables (in `frontend/.env`):
+
+| Variable | Required | Default | Description |
+| --- | --- | --- | --- |
+| `VITE_API_URL` | no | `http://localhost:4000/api` | Backend API base URL |
 
 Environment variables are validated at startup in `src/config/env.ts`. The app refuses to start if something is missing or invalid.
 
@@ -399,9 +436,16 @@ Run from `backend/`:
 | `pnpm db:generate` | `prisma generate` |
 | `pnpm db:studio` | Open Prisma Studio |
 
+Run from `frontend/`:
+
+| Script | Description |
+| --- | --- |
+| `pnpm dev` | Start the Vite dev server |
+| `pnpm build` | Type-check with `vue-tsc` and build for production |
+| `pnpm preview` | Preview the production build |
+
 ## Roadmap
 
-1. **Frontend foundation** — Vue 3 + Vite + TypeScript, Tailwind CSS, Pinia auth store, login/register pages.
-2. **Booking UI** — room list, room detail, date picker, hourly slot grid, multi-slot selection.
-3. **User & admin pages** — reservation history, admin room CRUD, all-bookings table, operating hours form.
-4. **Production setup** — Dockerfile for backend and frontend, Nginx, root `docker-compose.yml`, seed script, polished README.
+1. **Booking UI** — room list, room detail, date picker, hourly slot grid, multi-slot selection.
+2. **User & admin pages** — reservation history, admin room CRUD, all-bookings table, operating hours form.
+3. **Production setup** — Dockerfile for backend and frontend, Nginx, root `docker-compose.yml`, seed script, polished README.
