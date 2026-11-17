@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import Button from 'openvue/button'
+import InputText from 'openvue/inputtext'
+import Message from 'openvue/message'
+import Password from 'openvue/password'
 import { getApiErrorMessage } from '@/lib/api'
 import { useAuthStore } from '@/stores/auth'
 
@@ -27,70 +31,100 @@ async function submit() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-md">
-    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-      <h1 class="text-2xl font-bold">Create your account</h1>
-      <p class="mt-1 text-sm text-slate-600">Sign up to start booking rooms.</p>
+  <div class="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1fr_1fr] lg:items-stretch">
+    <section class="surface-dark relative overflow-hidden p-8 sm:p-10">
+      <div class="relative">
+        <p class="font-mono text-[11px] tracking-[0.1em] text-white/70 uppercase">Get started</p>
+        <h1 class="mt-3 font-display text-3xl leading-tight font-extrabold tracking-tight text-white">
+          Reserve a room in
+          <span class="text-violet-200">under a minute.</span>
+        </h1>
+        <p class="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
+          Create an account to book hourly slots, see your reservation history, and cancel when
+          plans change.
+        </p>
 
-      <form class="mt-6 space-y-4" @submit.prevent="submit">
+        <dl class="mt-8 grid grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-white/15 bg-white/5 p-4">
+            <dt class="font-mono text-[10px] tracking-[0.1em] text-white/70 uppercase">Billing</dt>
+            <dd class="mt-1 text-sm font-semibold text-white">Pay per hour used</dd>
+          </div>
+          <div class="rounded-2xl border border-white/15 bg-white/5 p-4">
+            <dt class="font-mono text-[10px] tracking-[0.1em] text-white/70 uppercase">
+              Confirmation
+            </dt>
+            <dd class="mt-1 text-sm font-semibold text-white">Instant</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="surface p-6 sm:p-8">
+      <h2 class="font-display text-2xl font-extrabold tracking-tight text-ink">
+        Create your account
+      </h2>
+      <p class="mt-1 text-sm text-muted">Sign up to start booking rooms.</p>
+
+      <form class="mt-6 space-y-5" @submit.prevent="submit">
         <div>
-          <label for="name" class="block text-sm font-medium text-slate-700">Name</label>
-          <input
+          <label for="name" class="mb-1.5 block text-sm font-semibold text-ink">Name</label>
+          <InputText
             id="name"
             v-model="form.name"
             type="text"
             autocomplete="name"
+            placeholder="Your full name"
             required
             minlength="2"
-            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            class="w-full"
           />
         </div>
 
         <div>
-          <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
-          <input
+          <label for="email" class="mb-1.5 block text-sm font-semibold text-ink">Email</label>
+          <InputText
             id="email"
             v-model="form.email"
             type="email"
             autocomplete="email"
+            placeholder="you@example.com"
             required
-            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            class="w-full"
           />
         </div>
 
         <div>
-          <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
-          <input
-            id="password"
+          <label for="password" class="mb-1.5 block text-sm font-semibold text-ink">Password</label>
+          <Password
             v-model="form.password"
-            type="password"
+            input-id="password"
+            toggle-mask
             autocomplete="new-password"
+            placeholder="At least 8 characters"
             required
             minlength="8"
-            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            class="w-full"
+            :input-style="{ width: '100%' }"
           />
-          <p class="mt-1 text-xs text-slate-500">At least 8 characters.</p>
+          <p class="mt-1.5 text-xs text-muted">At least 8 characters.</p>
         </div>
 
-        <p v-if="error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-          {{ error }}
-        </p>
+        <Message v-if="error" severity="error" :closable="false" size="small">{{ error }}</Message>
 
-        <button
+        <Button
           type="submit"
-          :disabled="loading"
-          class="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {{ loading ? 'Creating account...' : 'Create account' }}
-        </button>
+          :label="loading ? 'Creating account…' : 'Create account'"
+          :loading="loading"
+          class="w-full"
+        />
       </form>
 
-      <p class="mt-4 text-center text-sm text-slate-600">
+      <p class="mt-6 text-center text-sm text-muted">
         Already have an account?
-        <RouterLink to="/login" class="font-semibold text-indigo-600 hover:text-indigo-700">
+        <RouterLink to="/login" class="font-bold text-violet-600 hover:text-violet-700">
           Log in
         </RouterLink>
       </p>
-    </div>
+    </section>
   </div>
 </template>

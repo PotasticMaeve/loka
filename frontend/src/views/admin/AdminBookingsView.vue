@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import Button from 'openvue/button'
+import Column from 'openvue/column'
+import DataTable from 'openvue/datatable'
+import Message from 'openvue/message'
+import Select from 'openvue/select'
+import SelectButton from 'openvue/selectbutton'
+import { useToast } from 'openvue/usetoast'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { api, getApiErrorMessage } from '@/lib/api'
 import { formatCurrency, formatInZone } from '@/lib/format'
@@ -7,12 +14,14 @@ import type { Booking, BookingStatus, Settings } from '@/types/api'
 
 type Filter = BookingStatus | 'ALL'
 
-const filters: Array<{ value: Filter; label: string }> = [
-  { value: 'ALL', label: 'All' },
-  { value: 'CONFIRMED', label: 'Confirmed' },
-  { value: 'COMPLETED', label: 'Completed' },
-  { value: 'CANCELLED', label: 'Cancelled' },
+const filters: Array<{ label: string; value: Filter }> = [
+  { label: 'All', value: 'ALL' },
+  { label: 'Confirmed', value: 'CONFIRMED' },
+  { label: 'Completed', value: 'COMPLETED' },
+  { label: 'Cancelled', value: 'CANCELLED' },
 ]
+
+const toast = useToast()
 
 const bookings = ref<Booking[]>([])
 const filter = ref<Filter>('ALL')
@@ -58,6 +67,12 @@ async function updateStatus(booking: Booking, status: 'CANCELLED' | 'COMPLETED')
   try {
     await api.patch(`/bookings/${booking.id}/status`, { status })
     await loadBookings()
+    toast.add({
+      severity: status === 'COMPLETED' ? 'success' : 'info',
+      summary: status === 'COMPLETED' ? 'Booking completed' : 'Booking cancelled',
+      detail: booking.room.name,
+      life: 3000,
+    })
   } catch (err) {
     error.value = getApiErrorMessage(err)
   } finally {
@@ -73,95 +88,108 @@ onMounted(async () => {
 <template>
   <div class="space-y-5">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex flex-wrap gap-2">
-        <button
-          v-for="option in filters"
-          :key="option.value"
-          type="button"
-          class="rounded-full border px-3 py-1.5 text-sm font-medium transition"
-          :class="
-            filter === option.value
-              ? 'border-indigo-600 bg-indigo-600 text-white'
-              : 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100'
-          "
-          @click="changeFilter(option.value)"
-        >
-          {{ option.label }}
-        </button>
+      <div class="w-full sm:w-auto">
+        <Select
+          v-model="filter"
+          :options="filters"
+          option-label="label"
+          option-value="value"
+          class="w-full sm:hidden"
+          @change="changeFilter(filter)"
+        />
+        <div class="hidden sm:block">
+          <SelectButton
+            v-model="filter"
+            :options="filters"
+            option-label="label"
+            option-value="value"
+            :allow-empty="false"
+            @change="changeFilter(filter)"
+          />
+        </div>
       </div>
 
-      <button
-        type="button"
-        class="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-        :disabled="loading"
+      <Button
+        label="Refresh"
+        severity="secondary"
+        outlined
+        :loading="loading"
         @click="loadBookings"
+      />
+    </div>
+
+    <Message v-if="error" severity="error" :closable="false">{{ error }}</Message>
+
+    <div class="surface overflow-hidden">
+      <DataTable
+        :value="bookings"
+        data-key="id"
+        :loading="loading"
+        paginator
+        :rows="10"
+        striped-rows
+        responsive-layout="scroll"
       >
-        Refresh
-      </button>
-    </div>
+        <template #empty>
+          <p class="py-8 text-center text-sm text-muted">No bookings match this filter.</p>
+        </template>
 
-    <p v-if="error" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ error }}</p>
+        <Column header="Member" sortable field="user.name">
+          <template #body="{ data }">
+            <p class="font-medium text-ink">{{ data.user?.name ?? '—' }}</p>
+            <p class="text-xs text-muted">{{ data.user?.email ?? '' }}</p>
+          </template>
+        </Column>
 
-    <div v-if="loading" class="space-y-2">
-      <div v-for="n in 4" :key="n" class="h-12 animate-pulse rounded-lg border border-slate-200 bg-white" />
-    </div>
+        <Column header="Room" sortable field="room.name">
+          <template #body="{ data }">
+            <span class="text-muted">{{ data.room.name }}</span>
+          </template>
+        </Column>
 
-    <div v-else class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-      <table class="min-w-full divide-y divide-slate-200 text-sm">
-        <thead class="bg-slate-50 text-left text-xs font-semibold tracking-wide text-slate-500 uppercase">
-          <tr>
-            <th class="px-4 py-3">User</th>
-            <th class="px-4 py-3">Room</th>
-            <th class="px-4 py-3">Time</th>
-            <th class="px-4 py-3">Total</th>
-            <th class="px-4 py-3">Status</th>
-            <th class="px-4 py-3 text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          <tr v-for="booking in bookings" :key="booking.id">
-            <td class="px-4 py-3">
-              <p class="font-medium text-slate-900">{{ booking.user?.name ?? '—' }}</p>
-              <p class="text-xs text-slate-500">{{ booking.user?.email ?? '' }}</p>
-            </td>
-            <td class="px-4 py-3 text-slate-600">{{ booking.room.name }}</td>
-            <td class="px-4 py-3 text-slate-600">
-              <p>{{ formatInZone(booking.startTime, timezone) }}</p>
-              <p class="text-xs text-slate-500">until {{ formatInZone(booking.endTime, timezone) }}</p>
-            </td>
-            <td class="px-4 py-3 font-medium text-slate-900">
-              {{ formatCurrency(booking.totalPrice) }}
-            </td>
-            <td class="px-4 py-3"><StatusBadge :status="booking.status" /></td>
-            <td class="px-4 py-3">
-              <div v-if="booking.status === 'CONFIRMED'" class="flex justify-end gap-2">
-                <button
-                  type="button"
-                  :disabled="busyId === booking.id"
-                  class="rounded-md border border-emerald-300 px-2.5 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-60"
-                  @click="updateStatus(booking, 'COMPLETED')"
-                >
-                  Complete
-                </button>
-                <button
-                  type="button"
-                  :disabled="busyId === booking.id"
-                  class="rounded-md border border-red-300 px-2.5 py-1 text-xs font-medium text-red-700 transition hover:bg-red-50 disabled:opacity-60"
-                  @click="updateStatus(booking, 'CANCELLED')"
-                >
-                  Cancel
-                </button>
-              </div>
-              <p v-else class="text-right text-xs text-slate-400">—</p>
-            </td>
-          </tr>
-          <tr v-if="bookings.length === 0">
-            <td colspan="6" class="px-4 py-10 text-center text-slate-500">
-              No bookings match this filter.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <Column header="Time" sortable field="startTime">
+          <template #body="{ data }">
+            <p class="text-ink/80">{{ formatInZone(data.startTime, timezone) }}</p>
+            <p class="text-xs text-muted">until {{ formatInZone(data.endTime, timezone) }}</p>
+          </template>
+        </Column>
+
+        <Column header="Total" sortable field="totalPrice">
+          <template #body="{ data }">
+            <span class="font-medium text-ink">{{ formatCurrency(data.totalPrice) }}</span>
+          </template>
+        </Column>
+
+        <Column header="Status">
+          <template #body="{ data }">
+            <StatusBadge :status="data.status" />
+          </template>
+        </Column>
+
+        <Column header="">
+          <template #body="{ data }">
+            <div v-if="data.status === 'CONFIRMED'" class="flex justify-end gap-2">
+              <Button
+                label="Complete"
+                size="small"
+                severity="success"
+                outlined
+                :loading="busyId === data.id"
+                @click="updateStatus(data, 'COMPLETED')"
+              />
+              <Button
+                label="Cancel"
+                size="small"
+                severity="danger"
+                outlined
+                :loading="busyId === data.id"
+                @click="updateStatus(data, 'CANCELLED')"
+              />
+            </div>
+            <p v-else class="text-right text-xs text-slate-400">—</p>
+          </template>
+        </Column>
+      </DataTable>
     </div>
   </div>
 </template>
