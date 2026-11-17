@@ -25,10 +25,10 @@ onMounted(() => {
 
     <footer class="mt-8 border-t border-line">
       <div
-        class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-6 font-mono text-[11px] tracking-wide text-muted uppercase sm:px-6"
+        class="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-5 font-mono text-[11px] tracking-wide text-muted uppercase sm:px-6"
       >
-        <p>Loka — hourly room booking</p>
-        <p>Vue 3 · OpenVue · Tailwind</p>
+        <p>Loka Booking</p>
+        <p>Copyright @ 2026</p>
       </div>
     </footer>
 

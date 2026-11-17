@@ -78,7 +78,7 @@ function logout() {
           v-for="link in navLinks"
           :key="link.to"
           :to="link.to"
-          class="rounded-full px-3.5 py-1.5 text-sm font-semibold text-muted transition hover:bg-white hover:text-ink"
+          class="rounded-full px-3.5 py-1.5 text-sm font-semibold text-muted transition-colors hover:bg-violet-100 hover:text-violet-900"
           active-class="bg-ink text-white hover:bg-ink hover:text-white"
         >
           {{ link.label }}

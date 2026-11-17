@@ -4,52 +4,36 @@ import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 
-const features = [
-  {
-    title: 'Live availability',
-    description:
-      'Every hour of the day shows exactly one state: free, taken, or already past. No guessing, no double bookings.',
-    accent: 'bg-violet-600',
-  },
-  {
-    title: 'Conflict-safe checkout',
-    description:
-      'Each reservation is validated inside a database transaction, so two people clicking at once cannot take the same slot.',
-    accent: 'bg-violet-400',
-  },
-  {
-    title: 'Admin in one place',
-    description:
-      'Rooms, opening hours, and every reservation are managed from a single dashboard.',
-    accent: 'bg-violet-200',
-  },
-]
-
 const steps = [
   {
     step: '01',
     title: 'Pick a room',
-    description: 'Compare capacity, price per hour, and facilities.',
-    dot: 'bg-violet-600 text-white',
+    description:
+      'Compare capacity, hourly price, and facilities. Each card shows what is free today, so you pick with facts instead of guessing.',
+    badge: 'bg-violet-600 text-white',
+    timing: '~30 sec',
   },
   {
     step: '02',
     title: 'Choose the hours',
-    description: 'Select a contiguous block from the live slot grid.',
-    dot: 'bg-violet-300 text-violet-950',
+    description:
+      'Tap the free hours on the grid. Touching hours chain into a single reservation, and taken hours are visibly locked.',
+    badge: 'bg-violet-300 text-violet-950',
+    timing: '~1 min',
   },
   {
     step: '03',
     title: 'Confirm',
-    description: 'The booking shows up in My bookings instantly.',
-    dot: 'bg-violet-100 text-violet-900',
+    description:
+      'Review the total, confirm once, and the slot is yours. It lands in My bookings immediately, cancellable up to 2h before.',
+    badge: 'bg-violet-100 text-violet-900',
+    timing: 'instant',
   },
 ]
 
 const facts = [
   { label: 'Pricing', value: 'Per hour' },
   { label: 'Cancellation', value: 'Up to 2h before' },
-  { label: 'Conflict', value: 'Never' },
 ]
 </script>
 
@@ -106,7 +90,7 @@ const facts = [
           </template>
         </div>
 
-        <dl class="mt-10 grid max-w-lg grid-cols-3 gap-4 border-t border-white/15 pt-6">
+        <dl class="mt-10 grid max-w-sm grid-cols-2 gap-4 border-t border-white/15 pt-6">
           <div v-for="fact in facts" :key="fact.label">
             <dt class="font-mono text-[10px] tracking-[0.1em] text-white/70 uppercase">
               {{ fact.label }}
@@ -139,34 +123,61 @@ const facts = [
     </section>
 
     <section>
-      <p class="eyebrow">What makes it different</p>
-      <div class="mt-5 grid gap-4 sm:grid-cols-3">
-        <article
-          v-for="feature in features"
-          :key="feature.title"
-          class="surface group relative overflow-hidden p-6 transition hover:-translate-y-1 hover:shadow-[0_2px_0_#e0dacb,0_28px_52px_-30px_rgba(43,31,224,0.3)]"
-        >
-          <span class="mb-4 block h-2 w-10 rounded-full" :class="feature.accent" />
-          <h3 class="text-lg font-bold text-ink">{{ feature.title }}</h3>
-          <p class="mt-2 text-sm leading-relaxed text-muted">{{ feature.description }}</p>
-        </article>
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p class="eyebrow">How booking works</p>
+          <h2 class="mt-3 font-display text-2xl font-extrabold tracking-tight text-ink">
+            Three steps, about a minute.
+          </h2>
+        </div>
+        <p class="font-mono text-[11px] tracking-wide text-muted uppercase">No email · No approval</p>
       </div>
-    </section>
 
-    <section>
-      <p class="eyebrow">How it works</p>
-      <ol class="mt-5 grid gap-4 sm:grid-cols-3">
-        <li v-for="item in steps" :key="item.step" class="surface p-6">
-          <span
-            class="grid h-9 w-9 place-items-center rounded-full font-mono text-xs font-semibold"
-            :class="item.dot"
+      <ol class="mt-6 grid gap-4 sm:grid-cols-3 sm:gap-6">
+        <li
+          v-for="(item, index) in steps"
+          :key="item.step"
+          class="reveal relative"
+          :style="{ animationDelay: `${index * 110}ms` }"
+        >
+          <div
+            class="surface group flex h-full flex-col p-6 transition duration-200 hover:-translate-y-1 hover:border-violet-300 hover:shadow-[0_2px_0_#e4def6,0_28px_52px_-30px_rgba(124,58,237,0.4)]"
           >
-            {{ item.step }}
+            <div class="flex items-center gap-3">
+              <span
+                class="grid h-11 w-11 shrink-0 place-items-center rounded-2xl font-display text-lg font-extrabold"
+                :class="item.badge"
+              >
+                {{ item.step }}
+              </span>
+              <h3 class="text-base font-bold text-ink">{{ item.title }}</h3>
+            </div>
+
+            <p class="mt-3 flex-1 text-sm leading-relaxed text-muted">{{ item.description }}</p>
+
+            <p class="mt-4 font-mono text-[11px] tracking-wide text-violet-700 uppercase">
+              {{ item.timing }}
+            </p>
+          </div>
+
+          <span
+            v-if="index < steps.length - 1"
+            class="arrow-nudge pointer-events-none absolute top-1/2 -right-[22px] z-10 hidden -translate-y-1/2 text-violet-400 sm:block"
+            aria-hidden="true"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" class="h-5 w-5">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
           </span>
-          <h3 class="mt-4 text-base font-bold text-ink">{{ item.title }}</h3>
-          <p class="mt-1.5 text-sm leading-relaxed text-muted">{{ item.description }}</p>
         </li>
       </ol>
+
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <RouterLink to="/rooms">
+          <Button label="Start with step 1" />
+        </RouterLink>
+        <p class="text-sm text-muted">Pick a room and the rest is two taps.</p>
+      </div>
     </section>
   </div>
 </template>
