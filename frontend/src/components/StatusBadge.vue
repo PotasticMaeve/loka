@@ -6,9 +6,9 @@ defineProps<{ status: BookingStatus }>()
 // One hue (blue) with three weights: solid = active, tinted = done, ink = void.
 // Shape and text carry meaning; color only reinforces it.
 const classes: Record<BookingStatus, string> = {
-  CONFIRMED: 'bg-blue-600 text-white',
+  CONFIRMED: 'bg-violet-600 text-white',
   CANCELLED: 'bg-ink text-white',
-  COMPLETED: 'bg-blue-100 text-blue-900',
+  COMPLETED: 'bg-violet-100 text-violet-900',
 }
 
 const labels: Record<BookingStatus, string> = {

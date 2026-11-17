@@ -66,7 +66,7 @@ function logout() {
     <div class="mx-auto flex w-full max-w-6xl items-center gap-5 px-4 py-3 sm:px-6">
       <RouterLink to="/" class="group flex items-center gap-2.5">
         <span
-          class="grid h-10 w-10 place-items-center rounded-2xl bg-blue-600 font-display text-lg font-extrabold text-white transition group-hover:rotate-[-6deg]"
+          class="grid h-10 w-10 place-items-center rounded-2xl bg-violet-600 font-display text-lg font-extrabold text-white transition group-hover:rotate-[-6deg]"
         >
           L
         </span>
@@ -97,7 +97,7 @@ function logout() {
               :label="initials"
               shape="circle"
               size="normal"
-              class="!bg-blue-600 !font-semibold !text-white"
+              class="!bg-violet-600 !font-semibold !text-white"
             />
             <span class="hidden text-left sm:block">
               <span class="block text-sm font-semibold leading-tight text-ink">

@@ -13,27 +13,28 @@
   --font-display: 'Bricolage Grotesque', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
-  /* Loka palette — one blue family, no second accent. See DESIGN.md. */
-  --color-ink: #0a1033;
-  --color-paper: #f3f5fb;
-  --color-line: #dbe2f3;
-  --color-muted: #5a6483;
+  /* Loka palette — one violet family, no second accent, no gradients.
+     Depth comes from tint (light) and shade (dark) of the same hue. */
+  --color-ink: #1b1035;
+  --color-paper: #f7f5fd;
+  --color-line: #e4def6;
+  --color-muted: #5f5580;
 
-  --color-blue-50: #eef1ff;
-  --color-blue-100: #dee3ff;
-  --color-blue-200: #c2c9ff;
-  --color-blue-300: #9fa6ff;
-  --color-blue-400: #7a7cff;
-  --color-blue-500: #4f4bf5;
-  --color-blue-600: #2b1fe0;
-  --color-blue-700: #2216b4;
-  --color-blue-800: #1a1090;
-  --color-blue-900: #140b6b;
-  --color-blue-950: #0b0640;
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-violet-800: #5b21b6;
+  --color-violet-900: #4c1d95;
+  --color-violet-950: #2e1065;
 
   --radius-card: 26px;
-  --shadow-card: 0 1px 0 #dbe2f3, 0 24px 48px -34px rgba(10, 16, 51, 0.45);
-  --shadow-lift: 0 2px 0 #dbe2f3, 0 30px 56px -30px rgba(43, 31, 224, 0.35);
+  --shadow-card: 0 1px 0 #e4def6, 0 24px 48px -34px rgba(27, 16, 53, 0.45);
+  --shadow-lift: 0 2px 0 #e4def6, 0 30px 56px -30px rgba(124, 58, 237, 0.35);
 }
 
 @layer base {
@@ -56,27 +57,11 @@
   }
 
   ::selection {
-    @apply bg-blue-200 text-blue-950;
+    @apply bg-violet-200 text-violet-950;
   }
 }
 
 @layer components {
-  /* Two gradients only: a deep one for hero panels, a pale one for surfaces. */
-  .gradient-deep {
-    background-image: linear-gradient(135deg, #0b0640 0%, #2216b4 48%, #4f4bf5 100%);
-  }
-
-  .gradient-pale {
-    background-image: linear-gradient(180deg, #eef1ff 0%, #ffffff 100%);
-  }
-
-  .text-gradient {
-    background-image: linear-gradient(100deg, #ffffff 0%, #e9edff 62%, #cfd6ff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
   .eyebrow {
     @apply inline-flex items-center gap-2 rounded-full border border-line bg-white px-3 py-1
       font-mono text-[11px] font-medium tracking-[0.08em] text-muted uppercase;
@@ -94,9 +79,9 @@
     @apply rounded-[26px] border border-line bg-white;
   }
 
+  /* Solid deep violet — replaces the old gradient panel. */
   .surface-dark {
-    background-image: linear-gradient(135deg, #0b0640 0%, #2216b4 48%, #4f4bf5 100%);
-    @apply rounded-[26px] text-white;
+    @apply rounded-[26px] bg-violet-950 text-white;
   }
 
   .meta-label {
@@ -108,12 +93,12 @@
   }
 
   .chip {
-    @apply inline-flex items-center rounded-full border border-line bg-blue-50 px-2.5 py-1
-      text-xs font-medium text-blue-900;
+    @apply inline-flex items-center rounded-full border border-line bg-violet-50 px-2.5 py-1
+      text-xs font-medium text-violet-900;
   }
 
   .link-underline {
-    @apply underline decoration-blue-300 decoration-2 underline-offset-4;
+    @apply underline decoration-violet-300 decoration-2 underline-offset-4;
   }
 }
 

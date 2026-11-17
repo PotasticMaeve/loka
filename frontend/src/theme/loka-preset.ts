@@ -21,48 +21,48 @@ import Aura from '@openvue/themes/aura'
 import { definePreset } from '@openvue/themes'
 
 export const brandPalette = {
-  50: '#eeecff',
-  100: '#ddd9ff',
-  200: '#c2bcff',
-  300: '#9e94ff',
-  400: '#7a6bff',
-  500: '#4f3df5',
-  600: '#2b1fe0',
-  700: '#2216b4',
-  800: '#1b128c',
-  900: '#140d66',
-  950: '#0b0640',
+  50: '#f5f3ff',
+  100: '#ede9fe',
+  200: '#ddd6fe',
+  300: '#c4b5fd',
+  400: '#a78bfa',
+  500: '#8b5cf6',
+  600: '#7c3aed',
+  700: '#6d28d9',
+  800: '#5b21b6',
+  900: '#4c1d95',
+  950: '#2e1065',
 } as const
 
 /** Warm neutrals: cream paper at the light end, ink at the dark end. */
 const surfaceLight = {
   0: '#ffffff',
-  50: '#fbf8f0',
-  100: '#f3eee0',
-  200: '#e0dacb',
-  300: '#cdc5b1',
-  400: '#a8a08e',
-  500: '#7c7a72',
-  600: '#55566a',
-  700: '#3a3b4a',
-  800: '#24253a',
-  900: '#0d0e1c',
-  950: '#05050c',
+  50: '#faf8ff',
+  100: '#f2effc',
+  200: '#e4def6',
+  300: '#d0c7ea',
+  400: '#a99fd0',
+  500: '#7b739c',
+  600: '#5f5580',
+  700: '#443a66',
+  800: '#2c2350',
+  900: '#1b1035',
+  950: '#0f0821',
 } as const
 
 const surfaceDark = {
-  0: '#05050c',
-  50: '#0d0e1c',
-  100: '#15172b',
-  200: '#24253a',
-  300: '#3a3b4a',
-  400: '#55566a',
-  500: '#7c7a72',
-  600: '#a8a08e',
-  700: '#cdc5b1',
-  800: '#e0dacb',
-  900: '#f3eee0',
-  950: '#f8f4ea',
+  0: '#0f0821',
+  50: '#1b1035',
+  100: '#2c2350',
+  200: '#443a66',
+  300: '#5f5580',
+  400: '#7b739c',
+  500: '#a99fd0',
+  600: '#d0c7ea',
+  700: '#e4def6',
+  800: '#f2effc',
+  900: '#faf8ff',
+  950: '#ffffff',
 } as const
 
 export const LokaPreset = definePreset(Aura, {
@@ -96,11 +96,11 @@ export const LokaPreset = definePreset(Aura, {
         focusRing: {
           width: '3px',
           style: 'solid',
-          color: 'rgba(43, 31, 224, 0.28)',
+          color: 'rgba(124, 58, 237, 0.30)',
           offset: '2px',
         },
         mask: {
-          background: 'rgba(13, 14, 28, 0.55)',
+          background: 'rgba(27, 16, 53, 0.55)',
           color: '{surface.200}',
         },
         content: {
@@ -129,7 +129,7 @@ export const LokaPreset = definePreset(Aura, {
           focusRing: {
             width: '3px',
             style: 'solid',
-            color: 'rgba(43, 31, 224, 0.18)',
+            color: 'rgba(124, 58, 237, 0.20)',
             offset: '1px',
             shadow: 'none',
           },
@@ -191,7 +191,7 @@ export const LokaPreset = definePreset(Aura, {
     card: {
       root: {
         borderRadius: '{border.radius.xl}',
-        shadow: '0 1px 0 #e0dacb, 0 24px 48px -34px rgba(13, 14, 28, 0.45)',
+        shadow: '0 1px 0 #e4def6, 0 24px 48px -34px rgba(27, 16, 53, 0.45)',
       },
       body: { padding: '1.5rem' },
       title: { fontWeight: '700' },

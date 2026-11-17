@@ -41,15 +41,11 @@ async function submit() {
 <template>
   <div class="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1fr_1fr] lg:items-stretch">
     <section class="surface-dark relative overflow-hidden p-8 sm:p-10">
-      <div
-        class="pointer-events-none absolute -top-20 -right-16 h-64 w-64 rounded-full bg-blue-600/60 blur-3xl"
-        aria-hidden="true"
-      />
       <div class="relative">
         <p class="font-mono text-[11px] tracking-[0.1em] text-white/70 uppercase">Welcome back</p>
         <h1 class="mt-3 font-display text-3xl leading-tight font-extrabold tracking-tight text-white">
           Your rooms are
-          <span class="text-blue-200">one click</span> away.
+          <span class="text-violet-200">one click</span> away.
         </h1>
         <p class="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
           Log in to see live hourly availability, manage your reservations, and cancel without
@@ -62,7 +58,7 @@ async function submit() {
             :key="item"
             class="flex items-center gap-3 text-sm font-medium text-white/85"
           >
-            <span class="grid h-6 w-6 place-items-center rounded-full bg-white text-blue-900">
+            <span class="grid h-6 w-6 place-items-center rounded-full bg-white text-violet-900">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" class="h-3.5 w-3.5">
                 <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
@@ -118,7 +114,7 @@ async function submit() {
 
       <p class="mt-6 text-center text-sm text-muted">
         No account yet?
-        <RouterLink to="/register" class="font-bold text-blue-600 hover:text-blue-700">
+        <RouterLink to="/register" class="font-bold text-violet-600 hover:text-violet-700">
           Create one
         </RouterLink>
       </p>

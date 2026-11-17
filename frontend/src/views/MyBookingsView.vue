@@ -151,7 +151,7 @@ onMounted(async () => {
       v-else-if="bookings.length === 0"
       class="surface flex flex-col items-center gap-3 border-dashed px-6 py-16 text-center"
     >
-      <span class="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600 text-white">
+      <span class="grid h-12 w-12 place-items-center rounded-2xl bg-violet-600 text-white">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6">
           <path d="M8 2v4M16 2v4M3 10h18" stroke-linecap="round" />
           <rect x="3" y="4" width="18" height="18" rx="4" />

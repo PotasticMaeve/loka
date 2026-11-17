@@ -151,7 +151,7 @@ onMounted(loadSettings)
             </div>
           </div>
 
-          <p class="rounded-xl border border-line bg-blue-50 px-4 py-3 text-xs leading-relaxed text-blue-900">
+          <p class="rounded-xl border border-line bg-violet-50 px-4 py-3 text-xs leading-relaxed text-violet-900">
             Closing time must be later than opening time. Use an IANA timezone name such as
             <code class="font-mono">Asia/Jakarta</code>.
           </p>

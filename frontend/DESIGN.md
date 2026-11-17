@@ -1,12 +1,12 @@
 ---
 version: alpha
 name: Loka
-description: Single-hue blue system on a cool paper background. Deep gradients for focus surfaces, everything else quiet.
+description: Single-hue violet system on lavender paper. Depth from tint and shade only — no gradients, no second accent.
 colors:
-  primary: "#2B1FE0"
-  secondary: "#5A6483"
-  tertiary: "#0A1033"
-  neutral: "#F3F5FB"
+  primary: "#7C3AED"
+  secondary: "#5F5580"
+  tertiary: "#1B1035"
+  neutral: "#F7F5FD"
 typography:
   h1:
     fontFamily: Bricolage Grotesque
@@ -56,13 +56,13 @@ components:
     rounded: "{rounded.full}"
     padding: 12px
   button-primary-hover:
-    backgroundColor: "#2216B4"
+    backgroundColor: "#6D28D9"
     textColor: "#FFFFFF"
     rounded: "{rounded.full}"
     padding: 12px
   button-on-dark:
     backgroundColor: "#FFFFFF"
-    textColor: "#0B0640"
+    textColor: "{colors.tertiary}"
     rounded: "{rounded.full}"
     padding: 13px
   card:
@@ -70,6 +70,11 @@ components:
     textColor: "{colors.tertiary}"
     rounded: "{rounded.xl}"
     padding: 24px
+  panel-deep:
+    backgroundColor: "{colors.tertiary}"
+    textColor: "#FFFFFF"
+    rounded: "{rounded.xl}"
+    padding: 32px
   page-surface:
     backgroundColor: "{colors.neutral}"
     textColor: "{colors.tertiary}"
@@ -81,8 +86,8 @@ components:
     rounded: "{rounded.full}"
     padding: 4px
   tag-completed:
-    backgroundColor: "#DEE3FF"
-    textColor: "#140B6B"
+    backgroundColor: "#EDE9FE"
+    textColor: "#4C1D95"
     rounded: "{rounded.full}"
     padding: 4px
   tag-cancelled:
@@ -110,39 +115,38 @@ Loka books rooms by the hour. The interface has one job: make "which hours are
 free, and what will they cost" obvious in a single glance. Everything else is
 quiet.
 
-The system is deliberately single-hue. One blue family carries action,
-selection, and emphasis; neutrals carry structure. Depth comes from two
-gradients — a deep one for focus surfaces, a pale one for rest — instead of a
-rainbow of accent colors.
+The system is single-hue by design. One violet family carries action, selection,
+and emphasis; a desaturated violet-gray carries structure. Depth is expressed
+through **tint and shade of the same hue** — never through a gradient, and never
+through a second accent color.
 
 ## Colors
 
-- **Primary (#2B1FE0):** every interactive element. Primary buttons, selected
+- **Primary (#7C3AED):** every interactive element — primary buttons, selected
   slot, active navigation, focus rings.
-- **Tertiary (#0A1033):** ink. Headings, body text, and the "void" state
-  (cancelled bookings).
-- **Secondary (#5A6483):** supporting text, metadata labels, icons.
-- **Neutral (#F3F5FB):** cool paper. Page background behind white cards.
+- **Tertiary (#1B1035):** ink. Headings, body text, deep panels, and the "void"
+  state (cancelled bookings).
+- **Secondary (#5F5580):** supporting text, metadata labels, icons.
+- **Neutral (#F7F5FD):** lavender paper behind white cards.
 
-Depth comes from gradients, not from new hues:
+Depth ladder (what to reach for instead of a gradient):
 
-- `gradient-deep` — `linear-gradient(135deg, #0B0640, #2216B4 48%, #4F4BF5)`.
-  Hero panels, the selection summary, auth panels. Text on it is white or
-  white/70 at minimum.
-- `gradient-pale` — `linear-gradient(180deg, #EEF1FF, #FFFFFF)`. Quiet surface
-  washes behind content.
-- `text-gradient` — white to #CFD6FF. Display headlines on deep gradients only.
+- **violet-950 (#2E1065)** — deep panels that must dominate the page.
+- **violet-600 (#7C3AED)** — primary action and selection.
+- **violet-400 (#A78BFA)** — secondary emphasis, accent rules.
+- **violet-200 (#DDD6FE)** — quiet emphasis bars on white.
+- **violet-50 (#F5F3FF)** — inline chips and hit areas.
 
-Status uses one hue at three weights: solid blue (confirmed), blue tint
-(completed), ink (cancelled). Text always states the status; color only
+Status uses one hue at three weights: solid violet (confirmed), violet tint
+(completed), ink (cancelled). The text always states the status; color only
 reinforces it.
 
 ## Typography
 
-Bricolage Grotesque for headings at weight 800 with negative tracking; it is
-the only place the product raises its voice. DM Sans carries all body copy at
-400–700. JetBrains Mono is reserved for numbers that must align, IDs, prices,
-time ranges, and uppercase micro-labels.
+Bricolage Grotesque at 800 for headings with negative tracking; it is the only
+place the product raises its voice. DM Sans carries all body copy at 400–700.
+JetBrains Mono is reserved for prices, time ranges, IDs, and uppercase
+micro-labels.
 
 Fonts are self-hosted from `/fonts` (woff2, latin + latin-ext) so the app never
 depends on a third-party font CDN at runtime.
@@ -150,24 +154,25 @@ depends on a third-party font CDN at runtime.
 ## Layout
 
 Content is capped at 1152px and centered. Cards use 24px internal padding on an
-8px spacing scale; page sections are separated by 32–48px. The booking page
-splits into choices on the left and a sticky summary on the right at `lg`.
+8px scale; page sections are separated by 32–48px. The booking page splits into
+choices on the left and a sticky summary on the right at `lg`.
 
 ## Elevation & Depth
 
-Two levels only. Flat cards: 1px `#DBE2F3` border, no shadow. Interactive cards
-lift 4px on hover with a wide, low-opacity blue shadow. Overlays add a 55% ink
-mask.
+Two levels. Flat cards: 1px `#E4DEF6` border, no shadow. Interactive cards lift
+4px on hover with a wide, low-opacity violet shadow. Overlays add a 55% ink
+mask. No element uses a gradient, inner shadow, or glass effect.
 
 ## Shapes
 
 Buttons and tags are full pills. Inputs and time slots use 14px corners, cards
-26px, the hero panel 32px. Nothing is square.
+26px, deep panels 32px. Nothing is square.
 
 ## Components
 
 - **button-primary** is the only high-emphasis action per view.
-- **button-on-dark** replaces it on gradient panels: white fill, ink label.
+- **button-on-dark** replaces it on deep panels: white fill, ink label.
+- **panel-deep** is a solid violet-950 surface — never a gradient.
 - **card** holds one concept; if it needs an internal divider to make sense, it
   should be two cards.
 - **tag-confirmed / tag-completed / tag-cancelled** pair color with a text label
@@ -177,11 +182,10 @@ Buttons and tags are full pills. Inputs and time slots use 14px corners, cards
 
 ## Do's and Don'ts
 
-- Do keep every surface inside the blue family; add depth with gradients, not
-  with a second accent hue.
-- Do keep white or white/70 as the minimum text color on deep gradients.
+- Do build depth from tints and shades of violet plus neutral paper.
+- Do keep white on violet-600 or darker; white on violet-600 is 5.7:1.
 - Do format every price and time through a single formatter.
-- Don't put body copy on `gradient-deep` at less than 14px.
+- Don't use gradients, glows, or glass — they muddy the flat hierarchy.
+- Don't introduce a second accent hue for a status that already has one.
 - Don't use more than two font weights on one screen.
-- Don't introduce a new color for a status that already has one.
 - Don't nest a card inside a card to add grouping — change the spacing instead.

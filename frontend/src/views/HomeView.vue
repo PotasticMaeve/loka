@@ -9,22 +9,19 @@ const features = [
     title: 'Live availability',
     description:
       'Every hour of the day shows exactly one state: free, taken, or already past. No guessing, no double bookings.',
-    accent: 'bg-gradient-to-r from-blue-600 to-blue-400',
-    ink: 'text-blue-600',
+    accent: 'bg-violet-600',
   },
   {
     title: 'Conflict-safe checkout',
     description:
       'Each reservation is validated inside a database transaction, so two people clicking at once cannot take the same slot.',
-    accent: 'bg-gradient-to-r from-blue-600 to-blue-400',
-    ink: 'text-ink',
+    accent: 'bg-violet-400',
   },
   {
     title: 'Admin in one place',
     description:
       'Rooms, opening hours, and every reservation are managed from a single dashboard.',
-    accent: 'bg-ink',
-    ink: 'text-ink',
+    accent: 'bg-violet-200',
   },
 ]
 
@@ -33,19 +30,19 @@ const steps = [
     step: '01',
     title: 'Pick a room',
     description: 'Compare capacity, price per hour, and facilities.',
-    dot: 'bg-blue-600 text-white',
+    dot: 'bg-violet-600 text-white',
   },
   {
     step: '02',
     title: 'Choose the hours',
     description: 'Select a contiguous block from the live slot grid.',
-    dot: 'bg-blue-300 text-blue-950',
+    dot: 'bg-violet-300 text-violet-950',
   },
   {
     step: '03',
     title: 'Confirm',
     description: 'The booking shows up in My bookings instantly.',
-    dot: 'bg-blue-100 text-blue-900',
+    dot: 'bg-violet-100 text-violet-900',
   },
 ]
 
@@ -58,27 +55,19 @@ const facts = [
 
 <template>
   <div class="space-y-14">
-    <section class="relative overflow-hidden gradient-deep rounded-[32px] px-6 py-12 text-white sm:px-10 sm:py-16">
-      <div
-        class="pointer-events-none absolute -top-24 right-0 h-80 w-80 rounded-full bg-blue-600/60 blur-3xl"
-        aria-hidden="true"
-      />
-      <div
-        class="pointer-events-none absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-blue-500/40 blur-3xl"
-        aria-hidden="true"
-      />
+    <section class="relative overflow-hidden bg-violet-950 rounded-[32px] px-6 py-12 text-white sm:px-10 sm:py-16">
 
       <div class="relative max-w-2xl">
         <p
           class="inline-flex items-center gap-2 rounded-full border border-white/25 px-3 py-1 font-mono text-[11px] font-medium tracking-[0.1em] text-white/80 uppercase"
         >
-          <span class="h-1.5 w-1.5 rounded-full bg-blue-300" />
+          <span class="h-1.5 w-1.5 rounded-full bg-violet-300" />
           Hourly room booking
         </p>
 
         <h1 class="mt-5 font-display text-4xl leading-[0.98] font-extrabold tracking-[-0.035em] sm:text-6xl">
           Book the hours you need.
-          <span class="text-gradient">Not the whole day.</span>
+          <span class="text-violet-300">Not the whole day.</span>
         </h1>
 
         <p class="mt-5 max-w-xl text-base leading-relaxed text-white/75">
@@ -91,7 +80,7 @@ const facts = [
             <Button
               label="Browse rooms"
               size="large"
-              class="!border-white !bg-white !text-blue-950 hover:!bg-blue-50"
+              class="!border-white !bg-white !text-violet-950 hover:!bg-violet-50"
             />
           </RouterLink>
 
@@ -133,7 +122,7 @@ const facts = [
       class="surface flex flex-wrap items-center justify-between gap-4 p-6"
     >
       <div class="flex items-center gap-4">
-        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-blue-600 text-white">
+        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-violet-600 text-white">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" class="h-5 w-5">
             <path d="M8 2v4M16 2v4M3 10h18" stroke-linecap="round" />
             <rect x="3" y="4" width="18" height="18" rx="4" />

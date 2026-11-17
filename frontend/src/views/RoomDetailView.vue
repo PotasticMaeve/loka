@@ -74,13 +74,13 @@ function isSelected(hour: number) {
 
 function slotClasses(status: string, hour: number) {
   if (isSelected(hour)) {
-    return 'border-blue-600 bg-blue-600 text-white shadow-[0_10px_20px_-12px_rgba(43,31,224,0.9)] hover:bg-blue-700'
+    return 'border-violet-600 bg-violet-600 text-white shadow-[0_10px_20px_-12px_rgba(43,31,224,0.9)] hover:bg-violet-700'
   }
   if (status === 'AVAILABLE') {
-    return 'border-line bg-white text-ink hover:-translate-y-0.5 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700'
+    return 'border-line bg-white text-ink hover:-translate-y-0.5 hover:border-violet-400 hover:bg-violet-50 hover:text-violet-700'
   }
   if (status === 'BOOKED') {
-    return 'cursor-not-allowed border-blue-200 bg-blue-50 text-muted line-through'
+    return 'cursor-not-allowed border-violet-200 bg-violet-50 text-muted line-through'
   }
   return 'cursor-not-allowed border-line bg-paper text-muted/50'
 }
@@ -210,7 +210,7 @@ onMounted(async () => {
   <div class="space-y-6">
     <RouterLink
       to="/rooms"
-      class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-blue-700"
+      class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-violet-700"
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
         <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
@@ -302,7 +302,7 @@ onMounted(async () => {
                     <p class="text-sm font-medium text-slate-700">
                       {{ availableCount }} of {{ availability.slots.length }} hours free
                     </p>
-                    <p v-if="selectedSlots.length" class="text-xs font-medium text-blue-700">
+                    <p v-if="selectedSlots.length" class="text-xs font-medium text-violet-700">
                       {{ formatDuration(selectedSlots.length) }} selected
                     </p>
                   </div>
@@ -327,13 +327,13 @@ onMounted(async () => {
                       <span class="h-3 w-3 rounded border border-slate-300 bg-white" /> Available
                     </li>
                     <li class="flex items-center gap-1.5">
-                      <span class="h-3 w-3 rounded border border-blue-200 bg-blue-50" /> Booked
+                      <span class="h-3 w-3 rounded border border-violet-200 bg-violet-50" /> Booked
                     </li>
                     <li class="flex items-center gap-1.5">
                       <span class="h-3 w-3 rounded border border-slate-200 bg-slate-50" /> Past
                     </li>
                     <li class="flex items-center gap-1.5">
-                      <span class="h-3 w-3 rounded border border-blue-600 bg-blue-600" /> Selected
+                      <span class="h-3 w-3 rounded border border-violet-600 bg-violet-600" /> Selected
                     </li>
                   </ul>
                 </div>
@@ -365,7 +365,7 @@ onMounted(async () => {
               </div>
               <div class="flex items-end justify-between gap-3 border-t border-white/15 pt-3">
                 <dt class="text-white/60">Total</dt>
-                <dd class="font-display text-2xl font-extrabold text-blue-200">
+                <dd class="font-display text-2xl font-extrabold text-violet-200">
                   {{ formatCurrency(totalPrice) }}
                 </dd>
               </div>
@@ -375,7 +375,7 @@ onMounted(async () => {
               :label="auth.isAuthenticated ? 'Confirm booking' : 'Log in to book'"
               :loading="submitting"
               :disabled="!canBook"
-              class="mt-5 w-full !border-white !bg-white !text-blue-950 hover:!bg-blue-50"
+              class="mt-5 w-full !border-white !bg-white !text-violet-950 hover:!bg-violet-50"
               @click="confirmBooking"
             />
 
@@ -400,9 +400,9 @@ onMounted(async () => {
             </p>
           </div>
 
-          <div v-if="booked" class="rounded-[26px] border border-line bg-blue-50 p-6">
+          <div v-if="booked" class="rounded-[26px] border border-line bg-violet-50 p-6">
             <div class="flex items-start gap-3">
-              <span class="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-blue-200">
+              <span class="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-violet-200">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="h-4 w-4">
                   <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>

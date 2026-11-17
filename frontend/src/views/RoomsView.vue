@@ -13,10 +13,10 @@ const error = ref('')
 
 // Facilities cycle through the palette so a wall of chips stays scannable.
 const chipTones = [
-  'bg-blue-50 text-blue-900',
-  'bg-blue-100 text-blue-900',
-  'bg-blue-50 text-blue-800',
-  'bg-blue-100 text-blue-800',
+  'bg-violet-50 text-violet-900',
+  'bg-violet-100 text-violet-900',
+  'bg-violet-50 text-violet-800',
+  'bg-violet-100 text-violet-800',
 ]
 
 async function loadRooms() {
@@ -70,7 +70,7 @@ onMounted(loadRooms)
       v-else-if="rooms.length === 0"
       class="surface flex flex-col items-center gap-3 border-dashed px-6 py-16 text-center"
     >
-      <span class="grid h-12 w-12 place-items-center rounded-2xl bg-blue-600 text-white">
+      <span class="grid h-12 w-12 place-items-center rounded-2xl bg-violet-600 text-white">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-6 w-6">
           <rect x="3" y="4" width="18" height="16" rx="4" />
           <path d="M3 10h18" />
@@ -86,7 +86,7 @@ onMounted(loadRooms)
       <article
         v-for="room in rooms"
         :key="room.id"
-        class="surface group flex flex-col p-6 transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-[0_2px_0_#e0dacb,0_28px_52px_-30px_rgba(43,31,224,0.35)]"
+        class="surface group flex flex-col p-6 transition hover:-translate-y-1 hover:border-violet-300 hover:shadow-[0_2px_0_#e0dacb,0_28px_52px_-30px_rgba(43,31,224,0.35)]"
       >
         <div class="flex items-start justify-between gap-3">
           <div>
@@ -94,7 +94,7 @@ onMounted(loadRooms)
             <p class="mt-1 text-sm text-muted">Fits up to {{ room.capacity }} people</p>
           </div>
           <span
-            class="shrink-0 rounded-full bg-gradient-to-r from-blue-950 to-blue-600 px-3 py-1 font-mono text-xs font-semibold text-white"
+            class="shrink-0 rounded-full bg-violet-600 px-3 py-1 font-mono text-xs font-semibold text-white"
           >
             {{ formatCurrency(room.pricePerHour) }}/h
           </span>

@@ -33,15 +33,11 @@ async function submit() {
 <template>
   <div class="mx-auto grid w-full max-w-5xl gap-6 lg:grid-cols-[1fr_1fr] lg:items-stretch">
     <section class="surface-dark relative overflow-hidden p-8 sm:p-10">
-      <div
-        class="pointer-events-none absolute -bottom-24 -left-10 h-64 w-64 rounded-full bg-ink/40 blur-3xl"
-        aria-hidden="true"
-      />
       <div class="relative">
         <p class="font-mono text-[11px] tracking-[0.1em] text-white/70 uppercase">Get started</p>
         <h1 class="mt-3 font-display text-3xl leading-tight font-extrabold tracking-tight text-white">
           Reserve a room in
-          <span class="text-blue-200">under a minute.</span>
+          <span class="text-violet-200">under a minute.</span>
         </h1>
         <p class="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
           Create an account to book hourly slots, see your reservation history, and cancel when
@@ -125,7 +121,7 @@ async function submit() {
 
       <p class="mt-6 text-center text-sm text-muted">
         Already have an account?
-        <RouterLink to="/login" class="font-bold text-blue-600 hover:text-blue-700">
+        <RouterLink to="/login" class="font-bold text-violet-600 hover:text-violet-700">
           Log in
         </RouterLink>
       </p>

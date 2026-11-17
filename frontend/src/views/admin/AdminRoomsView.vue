@@ -212,7 +212,7 @@ onMounted(loadRooms)
           <template #body="{ data }">
             <span
               class="inline-flex rounded-full px-2.5 py-1 text-xs font-bold"
-              :class="data.isActive ? 'bg-blue-600 text-white' : 'border border-line bg-paper text-muted'"
+              :class="data.isActive ? 'bg-violet-600 text-white' : 'border border-line bg-paper text-muted'"
             >
               {{ data.isActive ? 'Active' : 'Inactive' }}
             </span>
