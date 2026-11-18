@@ -1,0 +1,19 @@
+name: loka-frontend
+
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        VITE_API_URL: https://loka-backend.claudiafelicia.com/api
+    image: ghcr.io/potasticmaeve/loka-frontend:v1.0.0
+    container_name: loka_frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - loka_net
+
+networks:
+  loka_net:
+    external: true

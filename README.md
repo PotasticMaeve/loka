@@ -2,7 +2,7 @@
 
 A room booking API for studios, meeting rooms, and shared spaces. Users can browse rooms, check hourly availability, and reserve time slots. Admins manage rooms, opening hours, and every reservation.
 
-> **Status:** the backend API is implemented and tested. The Vue frontend covers authentication, room browsing, hourly booking, reservation history, and an admin dashboard. Docker setup and the database seed are still in progress (see [Roadmap](#roadmap)).
+> **Status:** complete — the backend API, the Vue frontend, Docker setup, and the seed script are all in place.
 
 ## Tech stack
 
@@ -16,6 +16,7 @@ A room booking API for studios, meeting rooms, and shared spaces. Users can brow
 | Auth | JWT (`jsonwebtoken`) + bcrypt |
 | Date/time | `date-fns` + `date-fns-tz` |
 | Frontend | Vue 3, Vite, TypeScript, Pinia, Vue Router, Tailwind CSS |
+| Deployment | Docker, Docker Compose, Nginx |
 
 ## Features
 
@@ -43,11 +44,8 @@ A room booking API for studios, meeting rooms, and shared spaces. Users can brow
 - [x] Booking cancellation from the UI (2-hour rule enforced)
 - [x] Admin dashboard: room CRUD, all bookings, status updates
 - [x] Admin form for operating hours and timezone
-
-### Planned
-
-- [ ] Dockerfiles for backend and frontend, single root `docker-compose.yml`
-- [ ] `prisma/seed.ts` with demo admin/user accounts and sample rooms
+- [x] Dockerfiles for backend and frontend, split Compose files
+- [x] `prisma/seed.ts` with demo admin/user accounts and sample rooms
 
 ## Project structure
 
@@ -56,6 +54,7 @@ loka/
 ├── backend/
 │   ├── prisma/
 │   │   ├── schema.prisma
+│   │   ├── seed.ts                # demo users, rooms, settings
 │   │   └── migrations/
 │   ├── src/
 │   │   ├── config/env.ts          # validated environment variables
@@ -70,6 +69,8 @@ loka/
 │   │   ├── types/express.d.ts
 │   │   ├── app.ts
 │   │   └── server.ts
+│   ├── Dockerfile
+│   ├── docker-compose.yml         # db + backend
 │   ├── prisma.config.ts
 │   └── .env.example
 ├── frontend/
@@ -81,14 +82,15 @@ loka/
 │   │   ├── stores/auth.ts         # Pinia session store
 │   │   ├── types/
 │   │   ├── views/                 # home, auth, rooms, room detail, my bookings
-│   │   ├── views/admin/           # dashboard, rooms, bookings, settings, rooms, room detail
+│   │   ├── views/admin/           # dashboard, rooms, bookings, settings
 │   │   ├── App.vue
 │   │   ├── main.ts
 │   │   └── style.css
+│   ├── Dockerfile
+│   ├── docker-compose.yml         # frontend (Nginx)
+│   ├── nginx.conf                 # static hosting + /api proxy
 │   ├── vite.config.ts
 │   └── .env.example
-├── postgresql_17/
-│   └── docker-compose.yml         # local PostgreSQL only
 └── .gitignore
 ```
 
@@ -100,11 +102,100 @@ loka/
 
 ## Quick start
 
-### 1. Start PostgreSQL
+Two ways to run Loka: the whole stack in Docker, or the API and frontend locally for development.
+
+### Option A — Docker Compose (full stack)
+
+The Docker setup is split per app:
+
+| File | Services | Build context |
+| --- | --- | --- |
+| `backend/docker-compose.yml` | `db` (PostgreSQL) + `backend` (API) | `backend/` |
+| `frontend/docker-compose.yml` | `frontend` (SPA served by Nginx) | `frontend/` |
+
+The frontend joins the shared `loka_net` network that the backend stack creates, so **start the backend first**:
 
 ```bash
-cd postgresql_17
-docker compose up -d
+# 1. API + database
+cd backend
+docker compose up -d --build
+
+# 2. Frontend (in another terminal)
+cd frontend
+docker compose up -d --build
+```
+
+Then open **http://localhost:8080**.
+
+| Service | URL | Notes |
+| --- | --- | --- |
+| Frontend | http://localhost:8080 | Nginx serves the built SPA and proxies `/api` |
+| Backend | http://localhost:4000 | Also reachable directly for debugging |
+| PostgreSQL | `127.0.0.1:5432` | Data lives in the `postgresql_17_pgdata` volume |
+
+Migrations run automatically when the backend container starts. The database is not seeded automatically; run it once:
+
+```bash
+cd backend
+docker compose exec backend pnpm db:seed
+```
+
+Compose reads `backend/.env` for the API stack. `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `JWT_SECRET`, and `CORS_ORIGIN` are all **required** — there are no secrets or credentials baked into the compose file, so it refuses to start when one is missing:
+
+```text
+required variable POSTGRES_DB is missing a value: Set POSTGRES_DB in backend/.env
+```
+
+To stop everything, run `docker compose down` in `frontend/` first, then in `backend/`. The data volume is kept.
+
+If a container named `loka_db` is already running from an older setup, remove it first (`docker rm -f loka_db`); the volume survives.
+
+#### Building, tagging, and pushing images
+
+Both compose files declare a GitHub Container Registry image and accept a `TAG` variable:
+
+| File | Image |
+| --- | --- |
+| `backend/docker-compose.yml` | `ghcr.io/potasticmaeve/loka-backend:${TAG:-v1.0.0}` |
+| `frontend/docker-compose.yml` | `ghcr.io/potasticmaeve/loka-frontend:${TAG:-v1.0.0}` |
+
+```bash
+# Backend image (also defines the database service)
+cd backend
+docker compose build backend
+
+# Frontend image only — no database or backend required
+cd frontend
+docker compose build
+```
+
+Images default to `v1.0.0`; pass `TAG=x.y.z` to override. `postgres:17-alpine` is an official upstream image, so it is used directly and is not mirrored to ghcr.
+
+Push to the registry (needs a token with `write:packages`):
+
+```bash
+docker login ghcr.io
+
+docker push ghcr.io/potasticmaeve/loka-backend:v1.0.0
+docker push ghcr.io/potasticmaeve/loka-frontend:v1.0.0
+```
+
+On a deployment host, pull instead of building:
+
+```bash
+cd backend  && docker compose pull && docker compose up -d
+cd frontend && docker compose pull && docker compose up -d
+```
+
+Because each app owns its compose file, the frontend image can be built and pushed in a pipeline that never touches the backend.
+
+### Option B — Local development
+
+#### 1. Start PostgreSQL
+
+```bash
+cd backend
+docker compose up -d db
 ```
 
 This starts a container named `loka_db` with:
@@ -113,22 +204,20 @@ This starts a container named `loka_db` with:
 - password: `loka_app_pass`
 - port: `127.0.0.1:5432`
 
-Data is stored in the named Docker volume `postgresql_17_pgdata`, so it survives container restarts.
-
-### 2. Configure the backend
+#### 2. Configure the backend
 
 ```bash
-cd backend
 cp .env.example .env
 ```
 
 The template ships with empty values on purpose. Fill in `DATABASE_URL` and `JWT_SECRET`; the secret must be at least 32 characters.
 
-### 3. Install, migrate, and run
+#### 3. Install, migrate, and run
 
 ```bash
 pnpm install
 pnpm db:migrate        # applies migrations and generates the Prisma client
+pnpm db:seed           # demo users, rooms, and settings
 pnpm dev               # http://localhost:4000
 ```
 
@@ -139,7 +228,7 @@ curl http://localhost:4000/api/health
 # {"status":"ok","db":"connected","timestamp":"..."}
 ```
 
-### 4. Run the frontend
+#### 4. Run the frontend
 
 In a second terminal:
 
@@ -150,23 +239,42 @@ pnpm install
 pnpm dev               # http://localhost:5173
 ```
 
-Make sure `CORS_ORIGIN` in `backend/.env` matches the frontend URL (`http://localhost:5173` by default).
+In development the frontend calls `/api` and Vite proxies it to `http://localhost:4000` (see `vite.config.ts`), so CORS is not involved. When the API lives on another host, set `VITE_API_URL` to its full URL.
+
+### Demo accounts
+
+`prisma/seed.ts` creates these accounts and rooms:
+
+| Email | Password | Role |
+| --- | --- | --- |
+| `admin@loka.test` | `Admin12345` | `ADMIN` |
+| `user@loka.test` | `User12345` | `USER` |
+
+Rooms: **Studio A** (6 people, Rp75,000/hour), **Meeting Room** (12, Rp120,000/hour), **Rooftop Deck** (20, Rp150,000/hour). The seed is idempotent, so running it again will not duplicate rows.
 
 ## Environment variables
+
+Backend variables (in `backend/.env`):
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `DATABASE_URL` | yes | — | PostgreSQL connection string |
-| `JWT_SECRET` | yes | — | Signing secret, at least 32 characters |
+| `JWT_SECRET` | yes | — | Signing secret, at least 32 characters (also used by Compose) |
 | `PORT` | no | `4000` | HTTP port |
 | `NODE_ENV` | no | `development` | `development`, `test`, or `production` |
-| `CORS_ORIGIN` | no | `http://localhost:5173` | Allowed frontend origin |
+| `CORS_ORIGIN` | yes (Compose) | `http://localhost:5173` | Allowed frontend origin. Compose requires it (`http://localhost:8080`); local dev falls back to the Vite URL |
+| `POSTGRES_DB` | yes (Compose) | — | Database name used by the Compose `db` service |
+| `POSTGRES_USER` | yes (Compose) | — | Database user used by the Compose `db` service |
+| `POSTGRES_PASSWORD` | yes (Compose) | — | Database password used by the Compose `db` service |
+| `TAG` | no | `v1.0.0` | Image tag for the `ghcr.io` images |
+
+The compose file contains **no default credentials**. `POSTGRES_*`, `JWT_SECRET`, and `CORS_ORIGIN` use `${VAR:?message}`, so `docker compose` fails immediately with a clear message instead of silently falling back to a hardcoded password. Add `--env-file /dev/null` to `docker compose config` to verify the guards.
 
 Frontend variables (in `frontend/.env`):
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
-| `VITE_API_URL` | no | `http://localhost:4000/api` | Backend API base URL |
+| `VITE_API_URL` | no | `/api` | Backend API base URL. `/api` goes through the Vite dev proxy or the Nginx proxy in Docker |
 
 Environment variables are validated at startup in `src/config/env.ts`. The app refuses to start if something is missing or invalid.
 
@@ -235,9 +343,11 @@ pnpm db:generate     # regenerate the Prisma client
 pnpm db:studio       # open Prisma Studio at http://localhost:5555
 ```
 
-### Create the first admin
+### Seed data and the first admin
 
-Registration always creates a `USER`. Until the seed script exists, promote a user manually:
+`pnpm db:seed` creates the demo accounts listed in [Demo accounts](#demo-accounts), including an `ADMIN` user. Registration through the API always creates a `USER` role.
+
+To promote any other account, update the row directly:
 
 ```bash
 docker exec loka_db psql -U felicia -d loka_db \
@@ -441,6 +551,7 @@ Run from `backend/`:
 | `pnpm db:migrate` | `prisma migrate dev` |
 | `pnpm db:deploy` | `prisma migrate deploy` |
 | `pnpm db:generate` | `prisma generate` |
+| `pnpm db:seed` | Insert demo users, rooms, and settings (idempotent) |
 | `pnpm db:studio` | Open Prisma Studio |
 
 Run from `frontend/`:
@@ -451,6 +562,26 @@ Run from `frontend/`:
 | `pnpm build` | Type-check with `vue-tsc` and build for production |
 | `pnpm preview` | Preview the production build |
 
+Docker commands:
+
+| Where | Command | Description |
+| --- | --- | --- |
+| `backend/` | `docker compose up -d --build` | Start db + API |
+| `backend/` | `docker compose up -d db` | Start only PostgreSQL for local development |
+| `backend/` | `docker compose exec backend pnpm db:seed` | Seed the Docker database |
+| `frontend/` | `docker compose up -d --build` | Start the frontend on port 8080 |
+| `frontend/` | `TAG=v1.0.0 docker compose build` | Build and tag the frontend image |
+| `frontend/` | `docker compose down` | Stop the frontend |
+| `backend/` | `docker compose down` | Stop db + API (the data volume is kept) |
+
 ## Roadmap
 
-1. **Production setup** — Dockerfile for backend and frontend, Nginx, root `docker-compose.yml`, seed script, polished README.
+All planned phases are complete:
+
+1. ~~Backend API, database schema, and authentication~~
+2. ~~Vue frontend foundation with auth UI~~
+3. ~~Room browsing and hourly booking~~
+4. ~~Reservation history and admin dashboard~~
+5. ~~Docker setup, Nginx, seed script~~
+
+Ideas for later: email notifications, payment integration, room photos, and recurring bookings.
